@@ -1,0 +1,11 @@
+{
+    "Name": "SDV Crops Randomizer",
+    "Author": "BreakSyde",
+    "Version": "1.0.0",
+    "Description": "Content Patcher mod to shuffle various qualities of the crops in Stardew Valley",
+    "UniqueID": "BreakSyde.SDVCropsRandomizer",
+    "UpdateKeys": [],
+    "ContentPackFor": {
+        "UniqueID": "Pathoschild.ContentPatcher"
+    }
+}
