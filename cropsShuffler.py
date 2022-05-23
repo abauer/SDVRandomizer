@@ -2,8 +2,8 @@ import sys
 import getopt
 import random
 
-import CropData
-import ObjectInfoData
+import DataObjects.CropData as CropData
+import DataObjects.ObjectInfoData as ObjectInfoData
 
 # set the season a crop grows in to a random subset of the seasons
 def shuffleCropSeasons(cropDataDictionary):
