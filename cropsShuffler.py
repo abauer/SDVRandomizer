@@ -4,6 +4,7 @@ import random
 
 import DataObjects.CropData as CropData
 import DataObjects.ObjectInfoData as ObjectInfoData
+import ContentJSONHelper
 
 # set the season a crop grows in to a random subset of the seasons
 def shuffleCropSeasons(cropDataDictionary):
@@ -73,3 +74,4 @@ if __name__ == "__main__":
     objectInfo = ObjectInfoData.readObjectInfoFile()
     ObjectInfoData.updateCropDescriptions(cropsSettings, objectInfo)
     ObjectInfoData.writeObjectInfoFile(objectInfo)
+    ContentJSONHelper.writeContentJSON()
