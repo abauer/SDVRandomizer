@@ -1,82 +1,92 @@
 import json
 from pathlib import Path 
 
-# This class holds all settings for crops
-# Can parse the crop data strings and write new crop data strings
+# This class holds all settings for bundles
+# Can parse the bundle data strings and write new bundle data strings
+class BundleReward:
+    def __init__(self, rewardType="", rewardID=0, numRewards=0):
+        self.rewardType = str(rewardType)
+        self.rewardID = int(rewardID)
+        self.numRewards = int(numRewards)
 
-class CropData:
+class BundleRequirement:
+    def __init__(self, reqID=0, numReq=0, minQuality=0):
+        self.id = int(reqID)
+        self.numReq = int(numReq)
+        self.minQuality = int(minQuality)
 
-    def __init__(self, id, cropsSettingString):
-        self.id = int(id)
-        self.growthStages = []
-        self.seasons = []
-        self.spriteIndex = 0
-        self.harvestId = 0
-        self.regrowPeriod = -1
-        self.harvestMethod = 0
-        self.canExtraHarvest = False
-        self.extraHarvestRange = []
-        self.extraHarvestChance = 0.0
-        self.raisedSeed = False
-        self.hasTintColor = False
-        self.tintColor = []
+class BundleData:
+
+    def __init__(self, id, bundleSettingString):
+        self.id = id
+        self.name = ""
+        self.reward = BundleReward()
+        self.requirements = []
+        self.colorIndex = 0
+        self.numRequirementsToComplete = 0
+        self.translatedName = ""
         
-        self.parseSettingString(cropsSettingString)
+        self.parseSettingString(bundleSettingString)
 
     def parseSettingString(self, settingString):
         settings = settingString.split('/')
-        extraHarvestStrings = settings[6].split(' ')
         
-        self.growthStages = [int(growthStage) for growthStage in settings[0].split(' ')]
-        self.seasons = [str for str in settings[1].split(' ')]
-        self.spriteIndex = int(settings[2])
-        self.harvestId = int(settings[3])
-        self.regrowPeriod = int(settings[4])
-        self.harvestMethod = int(settings[5])
-        self.canExtraHarvest = (extraHarvestStrings[0] == "true")
-        if self.canExtraHarvest:
-            self.extraHarvestRange = [int(str) for str in extraHarvestStrings[1:4]]
-            self.extraHarvestChance = float(extraHarvestStrings[4])
-        self.raisedSeed = (settings[7] == "true")
-        self.hasTintColor = (settings[8].split(' ')[0] == "true")
-        if self.hasTintColor:
-            self.tintColor = [int(str) for str in settings[8].split(' ')[1:]]
+        self.name = settings[0]
+        
+        rewardData = settings[1].split(' ')
+        if len(rewardData) > 1:
+            self.reward = BundleReward(rewardData[0], rewardData[1], rewardData[2])
+
+        requirementData = settings[2].split(' ')
+        requirements = [["" for x in range(3)] for y in range(int(len(requirementData) / 3))]
+        for i in range(len(requirementData)):
+            requirements[int(i / 3)][i % 3] = requirementData[i]
+        for reqs in requirements:
+            self.requirements.append(BundleRequirement(reqs[0], reqs[1], reqs[2]))
+
+        self.colorIndex = int(settings[3])
+        if len(settings) >= 5 and settings[4].isdigit():
+            self.numRequirementsToComplete = int(settings[4])
+        elif len(settings) >= 5 and settings[4].isalpha():
+            self.numRequirementsToComplete = len(self.requirements)
+            self.translatedName = settings[4]
+        elif len(settings) < 5:
+            self.numRequirementsToComplete = len(self.requirements)
+
+        if len(settings) >= 6 and settings[5].isalpha():
+            self.translatedName = settings[5]
 
     def toSettingString(self):
         settingsStrings = []
-        settingsStrings.append(" ".join([str(gs) for gs in self.growthStages]))
-        settingsStrings.append(" ".join(self.seasons))
-        settingsStrings.append(str(self.spriteIndex))
-        settingsStrings.append(str(self.harvestId))
-        settingsStrings.append(str(self.regrowPeriod))
-        settingsStrings.append(str(self.harvestMethod))
-        if self.canExtraHarvest:
-            settingsStrings.append("true " + " ".join([str(setting) for setting in self.extraHarvestRange]) + " " + str(self.extraHarvestChance))
+        settingsStrings.append(self.name)
+        if self.reward.rewardType != "":
+            settingsStrings.append(self.reward.rewardType + ' ' + str(self.reward.rewardID) + ' ' + str(self.reward.numRewards))
         else:
-            settingsStrings.append("false")
-        settingsStrings.append(str(self.raisedSeed).lower())
-        if self.hasTintColor:
-            settingsStrings.append("true " + " ".join([str(setting) for setting in self.tintColor]))
-        else:
-            settingsStrings.append("false")
+            settingsStrings.append("")
+        requirements = [str(req.id) + ' ' + str(req.numReq) + ' ' + str(req.minQuality) for req in self.requirements]
+        settingsStrings.append(' '.join(requirements))
+        settingsStrings.append(str(self.colorIndex))
+        settingsStrings.append(str(self.numRequirementsToComplete))
+        if self.translatedName != "":
+            settingsStrings.append(str(self.translatedName))
         
         return "/".join(settingsStrings)
 
-def readCropsFile():
-    CROPS_FILE = "C:\Program Files (x86)\Steam\steamapps\common\Stardew Valley\Content (unpacked)\Data\Crops.json"
-    file = open(CROPS_FILE, "r")
+def readBundlesFile():
+    BUNDLES_FILE = "C:\Program Files (x86)\Steam\steamapps\common\Stardew Valley\Content (unpacked)\Data\Bundles.json"
+    file = open(BUNDLES_FILE, "r")
     stardewJsonData = json.load(file)
     
     settingsDictionary = {}
     for key, val in stardewJsonData.items():
-        settingsDictionary[key] = CropData(key, val)
+        settingsDictionary[key] = BundleData(key, val)
     return settingsDictionary
 
-def writeCropsFile(settingsDictionary):
-    RANDOMIZED_CROPS_FILE = Path.cwd() / "randomizedCrops.json"
-    file = open(RANDOMIZED_CROPS_FILE, "w+")
+def writeBundlesFile(settingsDictionary):
+    RANDOMIZED_BUNDLES_FILE = Path.cwd() / "randomizedBundles.json"
+    file = open(RANDOMIZED_BUNDLES_FILE, "w+")
 
-    cropsJSONData = {}
+    bundlesJSONData = {}
     for id, settingsObject in settingsDictionary.items():
-        cropsJSONData[id] = settingsObject.toSettingString()
-    json.dump(cropsJSONData, file, indent=2)
+        bundlesJSONData[id] = settingsObject.toSettingString()
+    json.dump(bundlesJSONData, file, indent=2)
