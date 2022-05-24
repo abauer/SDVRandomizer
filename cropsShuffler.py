@@ -4,6 +4,7 @@ import random
 
 import DataObjects.CropData as CropData
 import DataObjects.ObjectInfoData as ObjectInfoData
+import DataObjects.BundleData as BundleData
 import ContentJSONHelper
 
 # set the season a crop grows in to a random subset of the seasons
@@ -48,27 +49,42 @@ def randomizeHarvestDrops(cropDataDictionary):
 def parseArgs(argv):
 
     try:
-        opts, args = getopt.getopt(argv[1:], "sagh", ["shuffle-seasons", "all-seasons", "short-growth", "shuffle-harvest"])
+        opts, extra = getopt.getopt(argv[1:], "saghr:", ["shuffle-seasons", "all-seasons", "short-growth", "shuffle-harvest", "random-seed="])
     except getopt.GetoptError as err:
         print(err)
         sys.exit(2)
 
-    return [option for option, argument in opts]
+    return opts
 
 if __name__ == "__main__":
     cmdArgs = parseArgs(sys.argv)
     cropsSettings = CropData.readCropsFile()
 
-    for arg in cmdArgs:
-        if arg in ["-s", "--shuffle-seasons"]:
+    setSeed = False
+    for opt, arg in cmdArgs:
+        if opt in ["-r", "--random-seed"]:
+            random.seed(int(arg))
+            setSeed = True
+
+    if not setSeed:
+        seed = random.getrandbits(64)
+        random.seed(seed)
+        print(seed)
+
+    
+    for opt, arg in cmdArgs:
+        if opt in ["-s", "--shuffle-seasons"]:
             shuffleCropSeasons(cropsSettings)
-        elif arg in ["-a", "--all-seasons"]:
+            
+        elif opt in ["-a", "--all-seasons"]:
             setAllSeasons(cropsSettings)
-        elif arg in ["-g", "--short-growth"]:
+        elif opt in ["-g", "--short-growth"]:
             shortenCropGrowth(cropsSettings)
-        elif arg in ["-h", "--shuffle-harvest"]:
+        elif opt in ["-h", "--shuffle-harvest"]:
             randomizeHarvestDrops(cropsSettings)
 
+    bundleSettings = BundleData.readBundlesFile()
+    BundleData.writeBundlesFile(bundleSettings)
     CropData.writeCropsFile(cropsSettings)
     
     objectInfo = ObjectInfoData.readObjectInfoFile()

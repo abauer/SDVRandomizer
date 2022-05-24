@@ -3,7 +3,11 @@ from pathlib import Path
 
 def generateContentJSONHelper():
     jsonHelper = { "Format" : "1.26.0", "Changes" : []}
-    replacements = { "Data/Crops" : "assets/randomizedCrops.json", "Data/ObjectInformation" : "assets/updatedObjectInformation.json" }
+    replacements = {
+        "Data/Crops" : "assets/randomizedCrops.json", 
+        "Data/ObjectInformation" : "assets/updatedObjectInformation.json",
+        "Data/Bundles" : "assets/randomizedBundles.json"
+        }
     for target, replacement in replacements.items():
         changeDict = { "Action" : "Load", "Target" : target, "FromFile": replacement }
         jsonHelper["Changes"].append(changeDict)
