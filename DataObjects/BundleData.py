@@ -72,8 +72,8 @@ class BundleData:
         
         return "/".join(settingsStrings)
 
-def readBundlesFile():
-    BUNDLES_FILE = "C:\Program Files (x86)\Steam\steamapps\common\Stardew Valley\Content (unpacked)\Data\Bundles.json"
+def readBundlesFile(rootFilePath):
+    BUNDLES_FILE = rootFilePath + "\Data\Bundles.json"
     file = open(BUNDLES_FILE, "r")
     stardewJsonData = json.load(file)
     

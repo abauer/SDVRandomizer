@@ -62,8 +62,8 @@ class CropData:
         
         return "/".join(settingsStrings)
 
-def readCropsFile():
-    CROPS_FILE = "C:\Program Files (x86)\Steam\steamapps\common\Stardew Valley\Content (unpacked)\Data\Crops.json"
+def readCropsFile(rootFilePath):
+    CROPS_FILE = rootFilePath + "\Data\Crops.json"
     file = open(CROPS_FILE, "r")
     stardewJsonData = json.load(file)
     

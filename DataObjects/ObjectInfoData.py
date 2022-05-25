@@ -117,8 +117,8 @@ class ObjectInfoData:
                 settingsStrings.append(self.artifactOtherStuff)
         return "/".join(settingsStrings)
 
-def readObjectInfoFile():
-    OBJECT_INFO_FILE = "C:\Program Files (x86)\Steam\steamapps\common\Stardew Valley\Content (unpacked)\Data\ObjectInformation.json"
+def readObjectInfoFile(rootFilePath):
+    OBJECT_INFO_FILE = rootFilePath + "\Data\ObjectInformation.json"
     file = open(OBJECT_INFO_FILE, "r")
     stardewJsonData = json.load(file)
     

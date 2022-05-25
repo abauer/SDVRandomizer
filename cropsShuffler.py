@@ -49,7 +49,7 @@ def randomizeHarvestDrops(cropDataDictionary):
 def parseArgs(argv):
 
     try:
-        opts, extra = getopt.getopt(argv[1:], "saghr:", ["shuffle-seasons", "all-seasons", "short-growth", "shuffle-harvest", "random-seed="])
+        opts, extra = getopt.getopt(argv[1:], "saghr:f:", ["shuffle-seasons", "all-seasons", "short-growth", "shuffle-harvest", "random-seed=", "Unpacked-folder="])
     except getopt.GetoptError as err:
         print(err)
         sys.exit(2)
@@ -58,24 +58,26 @@ def parseArgs(argv):
 
 if __name__ == "__main__":
     cmdArgs = parseArgs(sys.argv)
-    cropsSettings = CropData.readCropsFile()
+    unpackedFilePath = "C:\Program Files (x86)\Steam\steamapps\common\Stardew Valley\Content (unpacked)"
 
     setSeed = False
     for opt, arg in cmdArgs:
         if opt in ["-r", "--random-seed"]:
             random.seed(int(arg))
             setSeed = True
+        elif opt in ["-f", "--Unpacked-folder"]:
+            unpackedFilePath = arg
 
     if not setSeed:
         seed = random.getrandbits(64)
         random.seed(seed)
         print(seed)
 
+    cropsSettings = CropData.readCropsFile(unpackedFilePath)
     
     for opt, arg in cmdArgs:
         if opt in ["-s", "--shuffle-seasons"]:
             shuffleCropSeasons(cropsSettings)
-            
         elif opt in ["-a", "--all-seasons"]:
             setAllSeasons(cropsSettings)
         elif opt in ["-g", "--short-growth"]:
@@ -83,11 +85,11 @@ if __name__ == "__main__":
         elif opt in ["-h", "--shuffle-harvest"]:
             randomizeHarvestDrops(cropsSettings)
 
-    bundleSettings = BundleData.readBundlesFile()
+    bundleSettings = BundleData.readBundlesFile(unpackedFilePath)
+    objectInfo = ObjectInfoData.readObjectInfoFile(unpackedFilePath)
+    ObjectInfoData.updateCropDescriptions(cropsSettings, objectInfo)
+
     BundleData.writeBundlesFile(bundleSettings)
     CropData.writeCropsFile(cropsSettings)
-    
-    objectInfo = ObjectInfoData.readObjectInfoFile()
-    ObjectInfoData.updateCropDescriptions(cropsSettings, objectInfo)
     ObjectInfoData.writeObjectInfoFile(objectInfo)
     ContentJSONHelper.writeContentJSON()
