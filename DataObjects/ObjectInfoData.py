@@ -127,15 +127,6 @@ def readObjectInfoFile(rootFilePath):
         settingsDictionary[key] = ObjectInfoData(key, val)
     return settingsDictionary
 
-def writeObjectInfoFile(settingsDictionary):
-    UPDATED_OBJECT_INFO_FILE = Path.cwd() / "updatedObjectInformation.json"
-    file = open(UPDATED_OBJECT_INFO_FILE, "w+")
-
-    objectInfoJSONData = {}
-    for id, settingsObject in settingsDictionary.items():
-        objectInfoJSONData[id] = settingsObject.toSettingString()
-    json.dump(objectInfoJSONData, file, indent=2)
-
 def updateCropDescriptions(cropsDataDictionary, objectInfoDictionary):
     for id, cropdata in cropsDataDictionary.items():
         descriptionString = "Plant these in the " + " or ".join(cropdata.seasons) + ". "
