@@ -9,6 +9,15 @@ import DataObjects.ObjectInfoData as ObjectInfoData
 import DataObjects.BundleData as BundleData
 import ContentJSONHelper
 
+def readUnpackedXNB(DataClassType, filePath):
+    file = open(filePath, "r")
+    stardewJsonData = json.load(file)
+    
+    settingsDictionary = {}
+    for key, val in stardewJsonData.items():
+        settingsDictionary[key] = DataClassType(key, val)
+    return settingsDictionary
+
 def writeDataFile(filename, settingsDictionary):
     RANDOMIZED_FILE = Path.cwd() / filename
     file = open(RANDOMIZED_FILE, "w+")
@@ -84,7 +93,7 @@ if __name__ == "__main__":
         random.seed(seed)
         print(seed)
 
-    cropsSettings = CropData.readCropsFile(unpackedFilePath)
+    cropsSettings = readUnpackedXNB(CropData.CropData, unpackedFilePath + "\Data\Crops.json")
     
     for opt, arg in cmdArgs:
         if opt in ["-s", "--shuffle-seasons"]:
@@ -96,8 +105,8 @@ if __name__ == "__main__":
         elif opt in ["-h", "--shuffle-harvest"]:
             randomizeHarvestDrops(cropsSettings)
 
-    bundleSettings = BundleData.readBundlesFile(unpackedFilePath)
-    objectInfo = ObjectInfoData.readObjectInfoFile(unpackedFilePath)
+    bundleSettings = readUnpackedXNB(BundleData.BundleData, unpackedFilePath + "\Data\Bundles.json")
+    objectInfo = readUnpackedXNB(ObjectInfoData.ObjectInfoData, unpackedFilePath + "\Data\ObjectInformation.json")
     ObjectInfoData.updateCropDescriptions(cropsSettings, objectInfo)
 
     writeDataFile("randomizedBundles.json", bundleSettings)

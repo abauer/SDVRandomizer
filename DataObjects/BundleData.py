@@ -1,5 +1,3 @@
-import json
-
 # This class holds all settings for bundles
 # Can parse the bundle data strings and write new bundle data strings
 class BundleReward:
@@ -70,13 +68,3 @@ class BundleData:
             settingsStrings.append(str(self.translatedName))
         
         return "/".join(settingsStrings)
-
-def readBundlesFile(rootFilePath):
-    BUNDLES_FILE = rootFilePath + "\Data\Bundles.json"
-    file = open(BUNDLES_FILE, "r")
-    stardewJsonData = json.load(file)
-    
-    settingsDictionary = {}
-    for key, val in stardewJsonData.items():
-        settingsDictionary[key] = BundleData(key, val)
-    return settingsDictionary

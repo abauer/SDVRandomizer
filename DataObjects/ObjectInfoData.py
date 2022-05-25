@@ -1,4 +1,3 @@
-import json
 from .CropData import CropData
 
 #Class to store information from ObjectInformation.xnb
@@ -115,16 +114,6 @@ class ObjectInfoData:
             if self.artifactOtherStuff != "":    
                 settingsStrings.append(self.artifactOtherStuff)
         return "/".join(settingsStrings)
-
-def readObjectInfoFile(rootFilePath):
-    OBJECT_INFO_FILE = rootFilePath + "\Data\ObjectInformation.json"
-    file = open(OBJECT_INFO_FILE, "r")
-    stardewJsonData = json.load(file)
-    
-    settingsDictionary = {}
-    for key, val in stardewJsonData.items():
-        settingsDictionary[key] = ObjectInfoData(key, val)
-    return settingsDictionary
 
 def updateCropDescriptions(cropsDataDictionary, objectInfoDictionary):
     for id, cropdata in cropsDataDictionary.items():
