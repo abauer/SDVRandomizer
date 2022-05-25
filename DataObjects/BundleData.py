@@ -1,5 +1,4 @@
 import json
-from pathlib import Path 
 
 # This class holds all settings for bundles
 # Can parse the bundle data strings and write new bundle data strings
@@ -81,12 +80,3 @@ def readBundlesFile(rootFilePath):
     for key, val in stardewJsonData.items():
         settingsDictionary[key] = BundleData(key, val)
     return settingsDictionary
-
-def writeBundlesFile(settingsDictionary):
-    RANDOMIZED_BUNDLES_FILE = Path.cwd() / "randomizedBundles.json"
-    file = open(RANDOMIZED_BUNDLES_FILE, "w+")
-
-    bundlesJSONData = {}
-    for id, settingsObject in settingsDictionary.items():
-        bundlesJSONData[id] = settingsObject.toSettingString()
-    json.dump(bundlesJSONData, file, indent=2)

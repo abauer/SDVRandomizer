@@ -1,5 +1,4 @@
 import json
-from pathlib import Path
 from .CropData import CropData
 
 #Class to store information from ObjectInformation.xnb
@@ -126,15 +125,6 @@ def readObjectInfoFile(rootFilePath):
     for key, val in stardewJsonData.items():
         settingsDictionary[key] = ObjectInfoData(key, val)
     return settingsDictionary
-
-def writeObjectInfoFile(settingsDictionary):
-    UPDATED_OBJECT_INFO_FILE = Path.cwd() / "updatedObjectInformation.json"
-    file = open(UPDATED_OBJECT_INFO_FILE, "w+")
-
-    objectInfoJSONData = {}
-    for id, settingsObject in settingsDictionary.items():
-        objectInfoJSONData[id] = settingsObject.toSettingString()
-    json.dump(objectInfoJSONData, file, indent=2)
 
 def updateCropDescriptions(cropsDataDictionary, objectInfoDictionary):
     for id, cropdata in cropsDataDictionary.items():

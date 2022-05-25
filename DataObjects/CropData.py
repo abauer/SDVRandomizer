@@ -1,5 +1,4 @@
 import json
-from pathlib import Path 
 
 # This class holds all settings for crops
 # Can parse the crop data strings and write new crop data strings
@@ -71,12 +70,3 @@ def readCropsFile(rootFilePath):
     for key, val in stardewJsonData.items():
         settingsDictionary[key] = CropData(key, val)
     return settingsDictionary
-
-def writeCropsFile(settingsDictionary):
-    RANDOMIZED_CROPS_FILE = Path.cwd() / "randomizedCrops.json"
-    file = open(RANDOMIZED_CROPS_FILE, "w+")
-
-    cropsJSONData = {}
-    for id, settingsObject in settingsDictionary.items():
-        cropsJSONData[id] = settingsObject.toSettingString()
-    json.dump(cropsJSONData, file, indent=2)

@@ -1,11 +1,22 @@
 import sys
 import getopt
 import random
+from pathlib import Path
+import json
 
 import DataObjects.CropData as CropData
 import DataObjects.ObjectInfoData as ObjectInfoData
 import DataObjects.BundleData as BundleData
 import ContentJSONHelper
+
+def writeDataFile(filename, settingsDictionary):
+    RANDOMIZED_FILE = Path.cwd() / filename
+    file = open(RANDOMIZED_FILE, "w+")
+
+    jsonData = {}
+    for id, settingsObject in settingsDictionary.items():
+        jsonData[id] = settingsObject.toSettingString()
+    json.dump(jsonData, file, indent=2)
 
 # set the season a crop grows in to a random subset of the seasons
 def shuffleCropSeasons(cropDataDictionary):
@@ -89,7 +100,7 @@ if __name__ == "__main__":
     objectInfo = ObjectInfoData.readObjectInfoFile(unpackedFilePath)
     ObjectInfoData.updateCropDescriptions(cropsSettings, objectInfo)
 
-    BundleData.writeBundlesFile(bundleSettings)
-    CropData.writeCropsFile(cropsSettings)
-    ObjectInfoData.writeObjectInfoFile(objectInfo)
+    writeDataFile("randomizedBundles.json", bundleSettings)
+    writeDataFile("randomizedCrops.json", cropsSettings)
+    writeDataFile("updatedObjectInformation.json", objectInfo)
     ContentJSONHelper.writeContentJSON()
