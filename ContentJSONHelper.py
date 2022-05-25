@@ -13,7 +13,7 @@ def generateContentJSONHelper():
         jsonHelper["Changes"].append(changeDict)
     return jsonHelper
 
-def writeContentJSON():
-   CONTENT_JSON_FILE = Path.cwd() / "content.json"
+def writeContentJSON(outputFilePath):
+   CONTENT_JSON_FILE = outputFilePath / "content.json"
    file = open(CONTENT_JSON_FILE, "w+")
    json.dump(generateContentJSONHelper(), file, indent=3)

@@ -18,9 +18,8 @@ def readUnpackedXNB(DataClassType, filePath):
         settingsDictionary[key] = DataClassType(key, val)
     return settingsDictionary
 
-def writeDataFile(filename, settingsDictionary):
-    RANDOMIZED_FILE = Path.cwd() / filename
-    file = open(RANDOMIZED_FILE, "w+")
+def writeDataFile(filepath, settingsDictionary):
+    file = open(filepath, "w+")
 
     jsonData = {}
     for id, settingsObject in settingsDictionary.items():
@@ -78,7 +77,7 @@ def parseArgs(argv):
 
 if __name__ == "__main__":
     cmdArgs = parseArgs(sys.argv)
-    unpackedFilePath = "C:\Program Files (x86)\Steam\steamapps\common\Stardew Valley\Content (unpacked)"
+    unpackedFilePath = Path("C:\Program Files (x86)\Steam\steamapps\common\Stardew Valley\Content (unpacked)")
 
     setSeed = False
     for opt, arg in cmdArgs:
@@ -86,14 +85,14 @@ if __name__ == "__main__":
             random.seed(int(arg))
             setSeed = True
         elif opt in ["-f", "--Unpacked-folder"]:
-            unpackedFilePath = arg
+            unpackedFilePath = Path(arg)
 
     if not setSeed:
         seed = random.getrandbits(64)
         random.seed(seed)
         print(seed)
 
-    cropsSettings = readUnpackedXNB(CropData.CropData, unpackedFilePath + "\Data\Crops.json")
+    cropsSettings = readUnpackedXNB(CropData.CropData, unpackedFilePath / "Data" / "Crops.json")
     
     for opt, arg in cmdArgs:
         if opt in ["-s", "--shuffle-seasons"]:
@@ -105,11 +104,14 @@ if __name__ == "__main__":
         elif opt in ["-h", "--shuffle-harvest"]:
             randomizeHarvestDrops(cropsSettings)
 
-    bundleSettings = readUnpackedXNB(BundleData.BundleData, unpackedFilePath + "\Data\Bundles.json")
-    objectInfo = readUnpackedXNB(ObjectInfoData.ObjectInfoData, unpackedFilePath + "\Data\ObjectInformation.json")
+    bundleSettings = readUnpackedXNB(BundleData.BundleData, unpackedFilePath / "Data" / "Bundles.json")
+    objectInfo = readUnpackedXNB(ObjectInfoData.ObjectInfoData, unpackedFilePath / "Data" / "ObjectInformation.json")
     ObjectInfoData.updateCropDescriptions(cropsSettings, objectInfo)
 
-    writeDataFile("randomizedBundles.json", bundleSettings)
-    writeDataFile("randomizedCrops.json", cropsSettings)
-    writeDataFile("updatedObjectInformation.json", objectInfo)
-    ContentJSONHelper.writeContentJSON()
+    outputDirectory = Path.cwd() / "bin"
+    outputDirectory.mkdir(exist_ok=True)
+
+    writeDataFile(str(outputDirectory / "randomizedBundles.json"), bundleSettings)
+    writeDataFile(str(outputDirectory / "randomizedCrops.json"), cropsSettings)
+    writeDataFile(str(outputDirectory / "updatedObjectInformation.json"), objectInfo)
+    ContentJSONHelper.writeContentJSON(outputDirectory)
