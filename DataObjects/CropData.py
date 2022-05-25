@@ -1,5 +1,3 @@
-import json
-
 # This class holds all settings for crops
 # Can parse the crop data strings and write new crop data strings
 
@@ -60,13 +58,3 @@ class CropData:
             settingsStrings.append("false")
         
         return "/".join(settingsStrings)
-
-def readCropsFile(rootFilePath):
-    CROPS_FILE = rootFilePath + "\Data\Crops.json"
-    file = open(CROPS_FILE, "r")
-    stardewJsonData = json.load(file)
-    
-    settingsDictionary = {}
-    for key, val in stardewJsonData.items():
-        settingsDictionary[key] = CropData(key, val)
-    return settingsDictionary
