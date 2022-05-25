@@ -1,5 +1,4 @@
 import json
-from pathlib import Path 
 
 # This class holds all settings for crops
 # Can parse the crop data strings and write new crop data strings

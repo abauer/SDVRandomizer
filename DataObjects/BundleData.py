@@ -1,5 +1,4 @@
 import json
-from pathlib import Path 
 
 # This class holds all settings for bundles
 # Can parse the bundle data strings and write new bundle data strings

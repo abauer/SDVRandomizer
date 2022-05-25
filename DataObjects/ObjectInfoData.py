@@ -1,5 +1,4 @@
 import json
-from pathlib import Path
 from .CropData import CropData
 
 #Class to store information from ObjectInformation.xnb
