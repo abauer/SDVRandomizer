@@ -7,6 +7,7 @@ import json
 import DataObjects.CropData as CropData
 import DataObjects.ObjectInfoData as ObjectInfoData
 import DataObjects.BundleData as BundleData
+import DataObjects.FishData as FishData
 import ContentJSONHelper
 
 def readUnpackedXNB(DataClassType, filePath):
@@ -105,6 +106,7 @@ if __name__ == "__main__":
             randomizeHarvestDrops(cropsSettings)
 
     bundleSettings = readUnpackedXNB(BundleData.BundleData, unpackedFilePath / "Data" / "Bundles.json")
+    fishSettings = readUnpackedXNB(FishData.FishData, unpackedFilePath / "Data" / "Fish.json")
     objectInfo = readUnpackedXNB(ObjectInfoData.ObjectInfoData, unpackedFilePath / "Data" / "ObjectInformation.json")
     ObjectInfoData.updateCropDescriptions(cropsSettings, objectInfo)
 
@@ -113,5 +115,6 @@ if __name__ == "__main__":
 
     writeDataFile(str(outputDirectory / "randomizedBundles.json"), bundleSettings)
     writeDataFile(str(outputDirectory / "randomizedCrops.json"), cropsSettings)
+    writeDataFile(str(outputDirectory / "randomizedFish.json"), fishSettings)
     writeDataFile(str(outputDirectory / "updatedObjectInformation.json"), objectInfo)
     ContentJSONHelper.writeContentJSON(outputDirectory)
