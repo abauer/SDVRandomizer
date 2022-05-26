@@ -9,6 +9,7 @@ import DataObjects.ObjectInfoData as ObjectInfoData
 import DataObjects.BundleData as BundleData
 import DataObjects.FishData as FishData
 import DataObjects.FruitTreeData as FruitTrees
+import DataObjects.AnimalData as AnimalData
 
 import ContentJSONHelper
 
@@ -110,6 +111,7 @@ if __name__ == "__main__":
     bundleSettings = readUnpackedXNB(BundleData.BundleData, unpackedFilePath / "Data" / "Bundles.json")
     fishSettings = readUnpackedXNB(FishData.FishData, unpackedFilePath / "Data" / "Fish.json")
     fruitTreeSettings = readUnpackedXNB(FruitTrees.FruitTreeData, unpackedFilePath / "Data" / "fruitTrees.json")
+    animalSettings = readUnpackedXNB(AnimalData.AnimalData, unpackedFilePath / "Data" / "FarmAnimals.json")
     objectInfo = readUnpackedXNB(ObjectInfoData.ObjectInfoData, unpackedFilePath / "Data" / "ObjectInformation.json")
     ObjectInfoData.updateCropDescriptions(cropsSettings, objectInfo)
 
@@ -120,5 +122,6 @@ if __name__ == "__main__":
     writeDataFile(str(outputDirectory / "randomizedCrops.json"), cropsSettings)
     writeDataFile(str(outputDirectory / "randomizedFish.json"), fishSettings)
     writeDataFile(str(outputDirectory / "randomizedFruitTrees.json"), fruitTreeSettings)
+    writeDataFile(str(outputDirectory / "randomizedAnimals.json"), animalSettings)
     writeDataFile(str(outputDirectory / "updatedObjectInformation.json"), objectInfo)
     ContentJSONHelper.writeContentJSON(outputDirectory)
