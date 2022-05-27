@@ -11,6 +11,7 @@ import DataObjects.FishData as FishData
 import DataObjects.FruitTreeData as FruitTrees
 import DataObjects.AnimalData as AnimalData
 import DataObjects.RecipeData as RecipeData
+import DataObjects.LocationData as LocationData
 
 import ContentJSONHelper
 
@@ -115,6 +116,7 @@ if __name__ == "__main__":
     animalSettings = readUnpackedXNB(AnimalData.AnimalData, unpackedFilePath / "Data" / "FarmAnimals.json")
     cookingSettings = readUnpackedXNB(RecipeData.RecipeData, unpackedFilePath / "Data" / "CookingRecipes.json")
     craftingSettings = readUnpackedXNB(RecipeData.RecipeData, unpackedFilePath / "Data" / "CraftingRecipes.json")
+    locationSettings = readUnpackedXNB(LocationData.LocationData, unpackedFilePath / "Data" / "Locations.json")
     objectInfo = readUnpackedXNB(ObjectInfoData.ObjectInfoData, unpackedFilePath / "Data" / "ObjectInformation.json")
     ObjectInfoData.updateCropDescriptions(cropsSettings, objectInfo)
 
@@ -128,5 +130,6 @@ if __name__ == "__main__":
     writeDataFile(str(outputDirectory / "randomizedAnimals.json"), animalSettings)
     writeDataFile(str(outputDirectory / "randomizedCooking.json"), cookingSettings)
     writeDataFile(str(outputDirectory / "randomizedCrafting.json"), craftingSettings)
+    writeDataFile(str(outputDirectory / "randomizedLocations.json"), locationSettings)
     writeDataFile(str(outputDirectory / "updatedObjectInformation.json"), objectInfo)
     ContentJSONHelper.writeContentJSON(outputDirectory)
