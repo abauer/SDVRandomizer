@@ -35,11 +35,11 @@ class BundleData:
             self.reward = BundleReward(rewardData[0], rewardData[1], rewardData[2])
 
         requirementData = settings[2].split(' ')
-        requirements = [["" for x in range(3)] for y in range(int(len(requirementData) / 3))]
-        for i in range(len(requirementData)):
-            requirements[int(i / 3)][i % 3] = requirementData[i]
-        for reqs in requirements:
-            self.requirements.append(BundleRequirement(reqs[0], reqs[1], reqs[2]))
+        reqIDs = [s for s in requirementData[::3]]
+        reqNum = [s for s in requirementData[1::3]]
+        reqQuality = [s for s in requirementData[2::3]]
+        for i in range(len(reqIDs)):
+            self.requirements.append(BundleRequirement(reqIDs[i], reqNum[i], reqQuality[i]))
 
         self.colorIndex = int(settings[3])
         if len(settings) >= 5 and settings[4].isdigit():
