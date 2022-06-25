@@ -123,3 +123,61 @@ def updateCropDescriptions(cropsDataDictionary, objectInfoDictionary):
 
         objectInfo = objectInfoDictionary[id]
         objectInfo.description = descriptionString
+
+class BigObjectInfoData:
+
+    def __init__(self, id, settingsString):
+        self.id = int(id)
+        self.name = ""
+        self.price = 0
+        self.edibility = -300
+        self.type = "Basic"
+        self.category = -9
+        self.description = ""
+        self.outdoors = False
+        self.indoors = False
+        self.fragility = 0
+        self.isLamp = False
+        self.displayName = ""
+
+        self.parseSettingsString(settingsString)
+
+    def parseSettingsString(settingsString):
+        settings = settingString.split('/')
+        self.name = settings[0]
+        self.price = int(settings[1])
+        self.edibility = int(settings[2])
+        typeAndCategory = settings[3].split(' ')
+        self.type = typeAndCategory[0]
+        self.category = int(typeAndCategory[1])
+        self.description = settings[4]
+        self.outdoors = (settings[5] == "true")
+        self.indoors = (settings[6] == "true")
+        self.fragility = int(settings[7])
+        if(len(settings) > 9)
+            self.isLamp = (settings[8] == "true")
+            self.displayName = settings[9]
+        else
+            self.isLamp = False
+            self.displayName = settings[8]
+
+    def toSettingString(self):
+        settingsStrings = []
+        settingsStrings.append(self.name)
+        settingsStrings.append(str(self.price))
+        settingsStrings.append(str(self.edibility))
+        settingsStrings.append(self.type + ' ' + str(self.category))
+        settingsStrings.append(self.description)
+        if self.outdoors:
+            settingsStrings.append("true")
+        else:
+            settingsStrings.append("false")
+        if self.indoors:
+            settingsStrings.append("true")
+        else:
+            settingsStrings.append("false")
+        settingsStrings.append(str(self.fragility))
+        if self.isLamp:
+            settingsStrings.append("true")
+        settingsStrings.append(self.translatedName)
+        return "/".join(settingsStrings)
