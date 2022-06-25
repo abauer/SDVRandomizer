@@ -82,7 +82,6 @@ if __name__ == "__main__":
     craftingSettings = readUnpackedXNB(RecipeData.RecipeData, unpackedFilePath / "Data" / "CraftingRecipes.json")
     locationSettings = readUnpackedXNB(LocationData.LocationData, unpackedFilePath / "Data" / "Locations.json")
     objectInfo = readUnpackedXNB(ObjectInfoData.ObjectInfoData, unpackedFilePath / "Data" / "ObjectInformation.json")
-    bigObjectInfo = readUnpackedXNB(ObjectInfoData.BigObjectInfoData, unpackedFilePath / "Data" / "BigCraftgablesInformation.json")
     ObjectInfoData.updateCropDescriptions(cropsSettings, objectInfo)
 
     outputDirectory = Path.cwd() / "bin"
