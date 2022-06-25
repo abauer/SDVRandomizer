@@ -49,10 +49,10 @@ if __name__ == "__main__":
 
     setSeed = False
     for opt, arg in cmdArgs:
-        if opt in ["-r", "--random-seed"]:
+        if opt == "--random-seed":
             random.seed(int(arg))
             setSeed = True
-        elif opt in ["-f", "--Unpacked-folder"]:
+        elif opt == "--Unpacked-folder":
             unpackedFilePath = Path(arg)
 
     if not setSeed:
@@ -72,13 +72,13 @@ if __name__ == "__main__":
     bigObjectInfo = readUnpackedXNB(ObjectInfoData.BigObjectInfoData, unpackedFilePath / "Data" / "BigCraftablesInformation.json")
 
     for opt, arg in cmdArgs:
-        if opt in ["-s", "--shuffle-seasons"]:
+        if opt == "--shuffle-seasons":
             sa.shuffleCropSeasons(cropsSettings)
-        elif opt in ["-a", "--all-seasons"]:
+        elif opt == "--all-seasons":
             sa.setAllSeasons(cropsSettings)
-        elif opt in ["-g", "--short-growth"]:
+        elif opt == "--short-growth":
             sa.shortenCropGrowth(cropsSettings)
-        elif opt in ["-h", "--shuffle-harvest"]:
+        elif opt == "--shuffle-harvest":
             sa.randomizeHarvestDrops(cropsSettings)
         elif opt == "--earlySeedMaker":
             sa.setEarlySeedMaker(craftingSettings)
