@@ -7,6 +7,8 @@ import DataObjects.AnimalData as AnimalData
 import DataObjects.RecipeData as RecipeData
 import DataObjects.LocationData as LocationData
 
+import random
+
 # set the season a crop grows in to a random subset of the seasons
 def shuffleCropSeasons(cropDataDictionary):
     seasons = ["spring", "summer", "fall", "winter"]
@@ -47,9 +49,9 @@ def randomizeHarvestDrops(cropDataDictionary):
         cropdata.harvestId = allHarvestIds.pop(random.randint(0, len(allHarvestIds) - 1))
 
 def chooseRewards(bigObjectDict, objectDict, options="8Crow"):
-    listRarecrowID = [id if (obj.name == "Rarecrow") for id, obj in bigObjectDict.items()]
-    listBigObjectID = [obj.id for id, obj in bigObjectDict.items()]
-    listObjectIDs = [obj.id if (obj.type in ["Seeds", "Fish", "Crafting"]) for id, obj in objectDict.items()]
+    listRarecrowID = [id for id, obj in bigObjectDict.items() if (obj.name == "Rarecrow")]
+    listBigObjectID = [id for id, obj in bigObjectDict.items()]
+    listObjectID = [id for id, obj in objectDict.items() if (obj.type in ["Seeds", "Fish", "Crafting"])]
 
     NUM_BUNDLES_TO_SHUFFLE = 30
     if "8Crow" in options:
@@ -68,66 +70,65 @@ def chooseRewards(bigObjectDict, objectDict, options="8Crow"):
         rewards[len(rewards):] = [BundleData.BundleReward("B0", id, 1) for id in listRarecrowID]
     return rewards
 
-def randomizeBundleRewards(bundleDataDictionary, possibleRewards):
+def shuffleBundleRewards(bundleDataDictionary, possibleRewards):
     for id, bundleData in bundleDataDictionary.items():
         if not id == "Abandoned Joja Mart/36":
-            bundleData.reward = random.sample(possibleRewards, 1)
-            rewards.remove(bundleData.reward)
+            bundleData.reward = possibleRewards.pop(random.randint(0, len(possibleRewards) -1))
 
-# Any basic item with type -15 except radioactive
-# Any basic item with type -28, -16, -27, -26, -7, -75, -81, -4, -6, -5, -18, -79
+# Any basic item with category -15 except radioactive
+# Any basic item with category -28, -16, -27, -26, -7, -75, -81, -4, -6, -5, -18, -79
 # No radioactive, no legend fish (Crimsonfish, Angler, Legend, Glacierfish, Mutant Carp, son of Crimsonfish, ms. Angler, Legend 2, Glacierfish jr., Radioactive carp)
 
-def getAllObjectsForType(objectInfoDict, type):
+def getAllObjectsForType(objectInfoDict, cat):
     VEGETABLE_ID = -75
     FRUIT_ID = -79
     ORE_ID = -15
     FISH_ID = -4
 
-    objects = [id if (obj.type == type) for id, obj in objectInfoDict.items()]
+    objects = [int(id) for id, obj in objectInfoDict.items() if (obj.category == cat)]
     
-    if type == ORE_ID:
+    if cat == ORE_ID:
         for x in [909, 910]:
             objects.remove(x)
-    elif type == FISH_ID:
+    elif cat == FISH_ID:
         for x in [159, 160, 163, 682, 775, 898, 899, 900, 901, 902]:
             objects.remove(x)
 
     requirements = []
     for id in objects:
-        if type in [VEGETABLE_ID, FRUIT_ID]:
-            requirements.append(bundleData.BundleRequirement(id, random.randint(1, 3) * 5, random.randint(0, 2)))
+        if cat in [VEGETABLE_ID, FRUIT_ID]:
+            requirements.append(BundleData.BundleRequirement(id, random.randint(1, 3) * 5, random.randint(0, 2)))
         else:
-            requirements.append(bundleData.BundleRequirement(id, random.randint(1, 3) * 5, 0))
+            requirements.append(BundleData.BundleRequirement(id, random.randint(1, 3) * 5, 0))
     return requirements
 
-def shuffleBundleRequirements(objectInfoDict, bundleDataDictionary, options="Crops,Fish,AnimalProd,Cooking,Forage,Artisan,Monster,Ore"):
-    listOfTypes = []
+def shuffleBundleRequirements(bundleDataDictionary, objectInfoDict, options="Crops,Fish,AnimalProd,Cooking,Forage,Artisan,Monster,Ore"):
+    listOfCategories = []
     if "Crops" in options:
-        listOfTypes.append(-75)
-        listOfTypes.append(-79)
+        listOfCategories.append(-75)
+        listOfCategories.append(-79)
     if "Fish" in options:
-        listOfTypes.append(-4)
+        listOfCategories.append(-4)
     if "AnimalProd" in options:
-        listOfTypes.append(-6)
-        listOfTypes.append(-5)
-        listOfTypes.append(-18)
+        listOfCategories.append(-6)
+        listOfCategories.append(-5)
+        listOfCategories.append(-18)
     if "Cooking" in options:
-        listOfTypes.append(-7)
+        listOfCategories.append(-7)
     if "Forage" in options:
-        listOfTypes.append(-16)
-        listOfTypes.append(-81)
-        listOfTypes.append(-27)
+        listOfCategories.append(-16)
+        listOfCategories.append(-81)
+        listOfCategories.append(-27)
     if "Artisan" in options:
-        listOfTypes.append(-26)
+        listOfCategories.append(-26)
     if "Monster" in options:
-        listOfTypes.append(-28)
+        listOfCategories.append(-28)
     if "Ore" in options:
-        listOfTypes.append(-15)
+        listOfCategories.append(-15)
 
     requirements = []
-    for type in listOfTypes:
-        requirements[len(requirements):] = getAllObjectsForType(objectInfoDict, type)
+    for cat in listOfCategories:
+        requirements[len(requirements):] = getAllObjectsForType(objectInfoDict, cat)
 
     for id, bundle in bundleDataDictionary.items():
         if not "Vault" in id:

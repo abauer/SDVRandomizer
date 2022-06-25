@@ -142,8 +142,8 @@ class BigObjectInfoData:
 
         self.parseSettingsString(settingsString)
 
-    def parseSettingsString(settingsString):
-        settings = settingString.split('/')
+    def parseSettingsString(self, settingsString):
+        settings = settingsString.split('/')
         self.name = settings[0]
         self.price = int(settings[1])
         self.edibility = int(settings[2])
@@ -154,10 +154,10 @@ class BigObjectInfoData:
         self.outdoors = (settings[5] == "true")
         self.indoors = (settings[6] == "true")
         self.fragility = int(settings[7])
-        if(len(settings) > 9)
+        if(len(settings) > 9):
             self.isLamp = (settings[8] == "true")
             self.displayName = settings[9]
-        else
+        else:
             self.isLamp = False
             self.displayName = settings[8]
 

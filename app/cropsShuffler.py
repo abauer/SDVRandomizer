@@ -14,7 +14,7 @@ import DataObjects.RecipeData as RecipeData
 import DataObjects.LocationData as LocationData
 
 import ContentJSONHelper
-import shufflingAlgorithms
+import shufflingAlgorithms as sa
 
 def readUnpackedXNB(DataClassType, filePath):
     file = open(filePath, "r")
@@ -66,13 +66,13 @@ if __name__ == "__main__":
     
     for opt, arg in cmdArgs:
         if opt in ["-s", "--shuffle-seasons"]:
-            shuffleCropSeasons(cropsSettings)
+            sa.shuffleCropSeasons(cropsSettings)
         elif opt in ["-a", "--all-seasons"]:
-            setAllSeasons(cropsSettings)
+            sa.setAllSeasons(cropsSettings)
         elif opt in ["-g", "--short-growth"]:
-            shortenCropGrowth(cropsSettings)
+            sa.shortenCropGrowth(cropsSettings)
         elif opt in ["-h", "--shuffle-harvest"]:
-            randomizeHarvestDrops(cropsSettings)
+            sa.randomizeHarvestDrops(cropsSettings)
 
     bundleSettings = readUnpackedXNB(BundleData.BundleData, unpackedFilePath / "Data" / "Bundles.json")
     fishSettings = readUnpackedXNB(FishData.FishData, unpackedFilePath / "Data" / "Fish.json")
@@ -82,8 +82,12 @@ if __name__ == "__main__":
     craftingSettings = readUnpackedXNB(RecipeData.RecipeData, unpackedFilePath / "Data" / "CraftingRecipes.json")
     locationSettings = readUnpackedXNB(LocationData.LocationData, unpackedFilePath / "Data" / "Locations.json")
     objectInfo = readUnpackedXNB(ObjectInfoData.ObjectInfoData, unpackedFilePath / "Data" / "ObjectInformation.json")
-    bigObjectInfo = readUnpackedXNB(ObjectInfoData.BigObjectInfoData, unpackedFilePath / "Data" / "BigCraftgablesInformation.json")
+    bigObjectInfo = readUnpackedXNB(ObjectInfoData.BigObjectInfoData, unpackedFilePath / "Data" / "BigCraftablesInformation.json")
     ObjectInfoData.updateCropDescriptions(cropsSettings, objectInfo)
+
+    rewards = sa.chooseRewards(bigObjectInfo, objectInfo)
+    sa.shuffleBundleRewards(bundleSettings, rewards)
+    sa.shuffleBundleRequirements(bundleSettings, objectInfo)
 
     outputDirectory = Path.cwd() / "bin"
     outputDirectory.mkdir(exist_ok=True)
