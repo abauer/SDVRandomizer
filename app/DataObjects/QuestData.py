@@ -6,7 +6,7 @@ class QuestData:
         self.name = ""
         self.flavorText = ""
         self.hint = ""
-        self.completion - ""
+        self.completion = ""
         self.nextQuest = ""
         self.goldReward = 0
         self.rewardDescription = ""
@@ -30,7 +30,7 @@ class QuestData:
         if len(settings) > 9:
             self.reactionText = settings[9]
 
-    def toSettingsString(self):
+    def toSettingString(self):
         settingsStrings = []
         settingsStrings.append(self.type)
         settingsStrings.append(self.name)
@@ -53,6 +53,6 @@ class QuestData:
         rewardString = ""
         if typeString == "money":
             rewardString = "%item money" + str(quantity) + ' ' + str(quantity + 1) + ' %%'
-        else
+        else:
             rewardString = "%item " + typeString + ' ' + str(id) + ' ' + str(quantity) + ' %%'
         self.reactionText = self.reactionText + rewardString

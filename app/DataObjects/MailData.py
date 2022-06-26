@@ -11,18 +11,21 @@ class MailData:
     def parseSettingsString(self, settingsString):
         if '%' in settingsString:
             startIndex = settingsString.find('%')
-            endIndex = settingsString.rfind('%')
-            self.firstPart = settingsString[:startIndex - 1]
+            endIndex = settingsString.find('[')
+            self.firstPart = settingsString[:startIndex]
             self.itemBlock = settingsString[startIndex:endIndex]
-            self.secondPart = settingsString[endIndex+1:]
+            self.secondPart = settingsString[endIndex:]
         else:
-            self.firstPart = settingsString
+            splitIndex = settingsString.find('[')
+            self.firstPart = settingsString[:splitIndex]
+            self.secondPart = settingsString[splitIndex:]
+            
 
-    def toSettingsString(self)
+    def toSettingString(self):
         return self.firstPart + self.itemBlock + self.secondPart
 
     def setRewardString(self, typeString, id, quantity):
         if typeString == "money":
             self.itemBlock = "%item money" + str(quantity) + ' ' + str(quantity + 1) + ' %%'
-        else
+        else:
             self.itemBlock = "%item " + typeString + ' ' + str(id) + ' ' + str(quantity) + ' %%'
