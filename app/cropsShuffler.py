@@ -12,6 +12,8 @@ import DataObjects.FruitTreeData as FruitTrees
 import DataObjects.AnimalData as AnimalData
 import DataObjects.RecipeData as RecipeData
 import DataObjects.LocationData as LocationData
+import DataObjects.QuestData as QuestData
+import DataObjects.MailData as MailData
 
 import ContentJSONHelper
 import shufflingAlgorithms as sa
@@ -86,6 +88,9 @@ if __name__ == "__main__":
             sa.setEarlySeedMaker(craftingSettings)
 
     ObjectInfoData.updateCropDescriptions(cropsSettings, objectInfo)
+
+    hints = sa.place8CrowRewards(bundleSettings, mailSettings, questSettings, objectInfo, bigObjectInfo)
+    print(hints)
 #    rewards = sa.chooseRewards(bigObjectInfo, objectInfo)
 #    sa.shuffleBundleRewards(bundleSettings, rewards)
 #    sa.shuffleBundleRequirements(bundleSettings, objectInfo)

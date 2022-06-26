@@ -147,7 +147,7 @@ def setEarlySeedMaker(craftingDictionary):
     craftingDictionary["Seed Maker"].learnLevel = 1
 
 def getAllIDsForCategory(objectInfoDict, catValue):
-    return [int(id) for id, obj in objectInfoDict.items() if (obj.category == cat)]
+    return [int(id) for id, obj in objectInfoDict.items() if (obj.category == catValue)]
 
 def get8CrowRewardsList(objectInfoDict, bigObjectDict):
     SEED_CATEGORY_VALUE = -74
@@ -186,33 +186,64 @@ def get8CrowRewardsList(objectInfoDict, bigObjectDict):
     rewards.append(Reward("bigObject", LIGHTNING_ROD_ID, 1))
     rewards.append(Reward("bigObject", LIGHTNING_ROD_ID, 1))
 
-    for id in random.sample(listSeedIDs, 25):
+    for id in random.sample(listSeedIDs, 26):
         rewards.append(Reward("object", id, 100))
 
     return rewards
 
 def place8CrowRewards(bundleDataDictionary, mailDataDictionary, questDataDictionary, objectInfoDict, bigObjectDict):
     rewards = get8CrowRewardsList(objectInfoDict, bigObjectDict)
+    hints = []
 
     reward = rewards.pop(random.randint(0, len(rewards)-1))
     mailDataDictionary["mom1"].setRewardString(reward.typeString, reward.id, reward.quantity)
     mailDataDictionary["dad1"].setRewardString(reward.typeString, reward.id, reward.quantity)
+    if reward.typeString == "object":
+        hints.append("It's nice that your parents are sending " + objectInfoDict[str(reward.id)].name)
+    else:
+        hints.append("It's nice that your parents are sending " + bigObjectDict[str(reward.id)].name)
     reward = rewards.pop(random.randint(0, len(rewards)-1))
     mailDataDictionary["mom2"].setRewardString(reward.typeString, reward.id, reward.quantity)
     mailDataDictionary["dad2"].setRewardString(reward.typeString, reward.id, reward.quantity)
+    if reward.typeString == "object":
+        hints.append("It's nice that your parents are sending " + objectInfoDict[str(reward.id)].name)
+    else:
+        hints.append("It's nice that your parents are sending " + bigObjectDict[str(reward.id)].name)
     reward = rewards.pop(random.randint(0, len(rewards)-1))
     mailDataDictionary["mom3"].setRewardString(reward.typeString, reward.id, reward.quantity)
     mailDataDictionary["dad3"].setRewardString(reward.typeString, reward.id, reward.quantity)
+    if reward.typeString == "object":
+        hints.append("It's nice that your parents are sending " + objectInfoDict[str(reward.id)].name)
+    else:
+        hints.append("It's nice that your parents are sending " + bigObjectDict[str(reward.id)].name)
     reward = rewards.pop(random.randint(0, len(rewards)-1))
     mailDataDictionary["mom4"].setRewardString(reward.typeString, reward.id, reward.quantity)
     mailDataDictionary["dad4"].setRewardString(reward.typeString, reward.id, reward.quantity)
+    if reward.typeString == "object":
+        hints.append("It's nice that your parents are sending " + objectInfoDict[str(reward.id)].name)
+    else:
+        hints.append("It's nice that your parents are sending " + bigObjectDict[str(reward.id)].name)
 
     for mail in ["QiChallengeComplete", "fishing2", "fishing6", "ccBulletinThankYou"]:
         reward = rewards.pop(random.randint(0, len(rewards)-1))
         mailDataDictionary[mail].setRewardString(reward.typeString, reward.id, reward.quantity)
+        if reward.typeString == "object":
+            hints.append("Check your mail! " + mail + " gives " + objectInfoDict[str(reward.id)].name)
+        else:
+            hints.append("Check your mail! " + mail + " gives " + bigObjectDict[str(reward.id)].name)
     for quest in range(100, 115):
         reward = rewards.pop(random.randint(0, len(rewards)-1))
         questDataDictionary[str(quest)].setRewardOnCompletion(reward.typeString, reward.id, reward.quantity)
+        if reward.typeString == "object":
+            hints.append("Completing " + questDataDictionary[str(quest)].name + " quest gives " + objectInfoDict[str(reward.id)].name)
+        else:
+            hints.append("Completing " + questDataDictionary[str(quest)].name + " quest gives " + bigObjectDict[str(reward.id)].name)
     for id, bundle in bundleDataDictionary.items():
-        reward = rewards.pop(random.randint(0, len(rewards)-1))
-        bundle.reward = BundleData.BundleReward(reward.typeString, reward.id, reward.quantity)
+        if not id == "Abandoned Joja Mart/36":
+            reward = rewards.pop(random.randint(0, len(rewards)-1))
+            bundle.reward = BundleData.BundleReward(reward.typeString, reward.id, reward.quantity)
+            if reward.typeString == "object":
+                hints.append("Completing " + bundle.name + " bundle gives " + objectInfoDict[str(reward.id)].name)
+            else:
+                hints.append("Completing " + bundle.name + " bundle gives " + bigObjectDict[str(reward.id)].name)
+    return hints
