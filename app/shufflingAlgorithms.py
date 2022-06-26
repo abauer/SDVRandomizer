@@ -134,3 +134,7 @@ def shuffleBundleRequirements(bundleDataDictionary, objectInfoDict, options="Cro
         if not "Vault" in id:
             bundle.numRequirementsToComplete = random.randint(2, 6)
             bundle.requirements = random.sample(requirements, random.randint(bundle.numRequirementsToComplete, 10))
+
+def setEarlySeedMaker(craftingDictionary):
+    craftingDictionary["Seed Maker"].learnLevel = 1
+    

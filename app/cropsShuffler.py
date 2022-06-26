@@ -33,12 +33,10 @@ def writeDataFile(filepath, settingsDictionary):
         jsonData[id] = settingsObject.toSettingString()
     json.dump(jsonData, file, indent=2)
 
-
-
 def parseArgs(argv):
 
     try:
-        opts, extra = getopt.getopt(argv[1:], "saghr:f:", ["shuffle-seasons", "all-seasons", "short-growth", "shuffle-harvest", "random-seed=", "Unpacked-folder="])
+        opts, extra = getopt.getopt(argv[1:], "", ["shuffle-seasons", "all-seasons", "short-growth", "shuffle-harvest", "earlySeedMaker", "random-seed=", "Unpacked-folder="])
     except getopt.GetoptError as err:
         print(err)
         sys.exit(2)
@@ -51,10 +49,10 @@ if __name__ == "__main__":
 
     setSeed = False
     for opt, arg in cmdArgs:
-        if opt in ["-r", "--random-seed"]:
+        if opt == "--random-seed":
             random.seed(int(arg))
             setSeed = True
-        elif opt in ["-f", "--Unpacked-folder"]:
+        elif opt == "--Unpacked-folder":
             unpackedFilePath = Path(arg)
 
     if not setSeed:
@@ -63,28 +61,29 @@ if __name__ == "__main__":
         print(seed)
 
     cropsSettings = readUnpackedXNB(CropData.CropData, unpackedFilePath / "Data" / "Crops.json")
-    
-    for opt, arg in cmdArgs:
-        if opt in ["-s", "--shuffle-seasons"]:
-            sa.shuffleCropSeasons(cropsSettings)
-        elif opt in ["-a", "--all-seasons"]:
-            sa.setAllSeasons(cropsSettings)
-        elif opt in ["-g", "--short-growth"]:
-            sa.shortenCropGrowth(cropsSettings)
-        elif opt in ["-h", "--shuffle-harvest"]:
-            sa.randomizeHarvestDrops(cropsSettings)
-
     bundleSettings = readUnpackedXNB(BundleData.BundleData, unpackedFilePath / "Data" / "Bundles.json")
     fishSettings = readUnpackedXNB(FishData.FishData, unpackedFilePath / "Data" / "Fish.json")
     fruitTreeSettings = readUnpackedXNB(FruitTrees.FruitTreeData, unpackedFilePath / "Data" / "fruitTrees.json")
     animalSettings = readUnpackedXNB(AnimalData.AnimalData, unpackedFilePath / "Data" / "FarmAnimals.json")
     cookingSettings = readUnpackedXNB(RecipeData.RecipeData, unpackedFilePath / "Data" / "CookingRecipes.json")
-    craftingSettings = readUnpackedXNB(RecipeData.RecipeData, unpackedFilePath / "Data" / "CraftingRecipes.json")
+    craftingSettings = readUnpackedXNB(RecipeData.RecipeData, unpackedFilePath / "Data" / "CraftingRecipes.json")    
     locationSettings = readUnpackedXNB(LocationData.LocationData, unpackedFilePath / "Data" / "Locations.json")
     objectInfo = readUnpackedXNB(ObjectInfoData.ObjectInfoData, unpackedFilePath / "Data" / "ObjectInformation.json")
     bigObjectInfo = readUnpackedXNB(ObjectInfoData.BigObjectInfoData, unpackedFilePath / "Data" / "BigCraftablesInformation.json")
-    ObjectInfoData.updateCropDescriptions(cropsSettings, objectInfo)
 
+    for opt, arg in cmdArgs:
+        if opt == "--shuffle-seasons":
+            sa.shuffleCropSeasons(cropsSettings)
+        elif opt == "--all-seasons":
+            sa.setAllSeasons(cropsSettings)
+        elif opt == "--short-growth":
+            sa.shortenCropGrowth(cropsSettings)
+        elif opt == "--shuffle-harvest":
+            sa.randomizeHarvestDrops(cropsSettings)
+        elif opt == "--earlySeedMaker":
+            sa.setEarlySeedMaker(craftingSettings)
+
+    ObjectInfoData.updateCropDescriptions(cropsSettings, objectInfo)
     rewards = sa.chooseRewards(bigObjectInfo, objectInfo)
     sa.shuffleBundleRewards(bundleSettings, rewards)
     sa.shuffleBundleRequirements(bundleSettings, objectInfo)
