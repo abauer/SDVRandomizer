@@ -70,6 +70,8 @@ if __name__ == "__main__":
     locationSettings = readUnpackedXNB(LocationData.LocationData, unpackedFilePath / "Data" / "Locations.json")
     objectInfo = readUnpackedXNB(ObjectInfoData.ObjectInfoData, unpackedFilePath / "Data" / "ObjectInformation.json")
     bigObjectInfo = readUnpackedXNB(ObjectInfoData.BigObjectInfoData, unpackedFilePath / "Data" / "BigCraftablesInformation.json")
+    questSettings = readUnpackedXNB(QuestData.QuestData, unpackedFilePath / "Data" / "Quests.json")
+    mailSettings = readUnpackedXNB(MailData.MailData, unpackedFilePath / "Data" / "mail.json")
 
     for opt, arg in cmdArgs:
         if opt == "--shuffle-seasons":
@@ -84,9 +86,9 @@ if __name__ == "__main__":
             sa.setEarlySeedMaker(craftingSettings)
 
     ObjectInfoData.updateCropDescriptions(cropsSettings, objectInfo)
-    rewards = sa.chooseRewards(bigObjectInfo, objectInfo)
-    sa.shuffleBundleRewards(bundleSettings, rewards)
-    sa.shuffleBundleRequirements(bundleSettings, objectInfo)
+#    rewards = sa.chooseRewards(bigObjectInfo, objectInfo)
+#    sa.shuffleBundleRewards(bundleSettings, rewards)
+#    sa.shuffleBundleRequirements(bundleSettings, objectInfo)
 
     outputDirectory = Path.cwd() / "bin"
     outputDirectory.mkdir(exist_ok=True)
@@ -99,5 +101,7 @@ if __name__ == "__main__":
     writeDataFile(str(outputDirectory / "randomizedCooking.json"), cookingSettings)
     writeDataFile(str(outputDirectory / "randomizedCrafting.json"), craftingSettings)
     writeDataFile(str(outputDirectory / "randomizedLocations.json"), locationSettings)
+    writeDataFile(str(outputDirectory / "randomizedQuests.json"), questSettings)
+    writeDataFile(str(outputDirectory / "randomizedMail.json"), mailSettings)
     writeDataFile(str(outputDirectory / "updatedObjectInformation.json"), objectInfo)
     ContentJSONHelper.writeContentJSON(outputDirectory)
