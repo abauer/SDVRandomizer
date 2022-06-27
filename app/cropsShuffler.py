@@ -14,6 +14,7 @@ import DataObjects.RecipeData as RecipeData
 import DataObjects.LocationData as LocationData
 import DataObjects.QuestData as QuestData
 import DataObjects.MailData as MailData
+import DataObjects.TipChannelData as TipChannelData
 
 import ContentJSONHelper
 import shufflingAlgorithms as sa
@@ -74,6 +75,7 @@ if __name__ == "__main__":
     bigObjectInfo = readUnpackedXNB(ObjectInfoData.BigObjectInfoData, unpackedFilePath / "Data" / "BigCraftablesInformation.json")
     questSettings = readUnpackedXNB(QuestData.QuestData, unpackedFilePath / "Data" / "Quests.json")
     mailSettings = readUnpackedXNB(MailData.MailData, unpackedFilePath / "Data" / "mail.json")
+    tipChannelSettings = readUnpackedXNB(MailData.MailData, unpackedFilePath / "Data" / "TV" / "TipChannel.json")
 
     for opt, arg in cmdArgs:
         if opt == "--shuffle-seasons":
@@ -90,7 +92,7 @@ if __name__ == "__main__":
     ObjectInfoData.updateCropDescriptions(cropsSettings, objectInfo)
 
     hints = sa.place8CrowRewards(bundleSettings, mailSettings, questSettings, objectInfo, bigObjectInfo)
-    print(hints)
+    sa.setHintsInTipChannel(tipChannelSettings, hints)
 #    rewards = sa.chooseRewards(bigObjectInfo, objectInfo)
 #    sa.shuffleBundleRewards(bundleSettings, rewards)
 #    sa.shuffleBundleRequirements(bundleSettings, objectInfo)
@@ -109,4 +111,5 @@ if __name__ == "__main__":
     writeDataFile(str(outputDirectory / "randomizedQuests.json"), questSettings)
     writeDataFile(str(outputDirectory / "randomizedMail.json"), mailSettings)
     writeDataFile(str(outputDirectory / "updatedObjectInformation.json"), objectInfo)
+    writeDataFile(str(outputDirectory / "updatedTipChannel.json"), tipChannelSettings)
     ContentJSONHelper.writeContentJSON(outputDirectory)

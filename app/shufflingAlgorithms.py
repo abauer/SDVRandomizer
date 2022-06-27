@@ -8,6 +8,7 @@ import DataObjects.RecipeData as RecipeData
 import DataObjects.LocationData as LocationData
 import DataObjects.QuestData as QuestData
 import DataObjects.MailData as MailData
+import DataObjects.TipChannelData as TipChannelData
 
 import random
 
@@ -199,30 +200,30 @@ def place8CrowRewards(bundleDataDictionary, mailDataDictionary, questDataDiction
     mailDataDictionary["mom1"].setRewardString(reward.typeString, reward.id, reward.quantity)
     mailDataDictionary["dad1"].setRewardString(reward.typeString, reward.id, reward.quantity)
     if reward.typeString == "object":
-        hints.append("It's nice that your parents are sending " + objectInfoDict[str(reward.id)].name)
+        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + objectInfoDict[str(reward.id)].name)
     else:
-        hints.append("It's nice that your parents are sending " + bigObjectDict[str(reward.id)].name)
+        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + bigObjectDict[str(reward.id)].name)
     reward = rewards.pop(random.randint(0, len(rewards)-1))
     mailDataDictionary["mom2"].setRewardString(reward.typeString, reward.id, reward.quantity)
     mailDataDictionary["dad2"].setRewardString(reward.typeString, reward.id, reward.quantity)
     if reward.typeString == "object":
-        hints.append("It's nice that your parents are sending " + objectInfoDict[str(reward.id)].name)
+        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + objectInfoDict[str(reward.id)].name)
     else:
-        hints.append("It's nice that your parents are sending " + bigObjectDict[str(reward.id)].name)
+        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + bigObjectDict[str(reward.id)].name)
     reward = rewards.pop(random.randint(0, len(rewards)-1))
     mailDataDictionary["mom3"].setRewardString(reward.typeString, reward.id, reward.quantity)
     mailDataDictionary["dad3"].setRewardString(reward.typeString, reward.id, reward.quantity)
     if reward.typeString == "object":
-        hints.append("It's nice that your parents are sending " + objectInfoDict[str(reward.id)].name)
+        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + objectInfoDict[str(reward.id)].name)
     else:
-        hints.append("It's nice that your parents are sending " + bigObjectDict[str(reward.id)].name)
+        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + bigObjectDict[str(reward.id)].name)
     reward = rewards.pop(random.randint(0, len(rewards)-1))
     mailDataDictionary["mom4"].setRewardString(reward.typeString, reward.id, reward.quantity)
     mailDataDictionary["dad4"].setRewardString(reward.typeString, reward.id, reward.quantity)
     if reward.typeString == "object":
-        hints.append("It's nice that your parents are sending " + objectInfoDict[str(reward.id)].name)
+        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + objectInfoDict[str(reward.id)].name)
     else:
-        hints.append("It's nice that your parents are sending " + bigObjectDict[str(reward.id)].name)
+        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + bigObjectDict[str(reward.id)].name)
 
     for mail in ["QiChallengeComplete", "fishing2", "fishing6", "ccBulletinThankYou"]:
         reward = rewards.pop(random.randint(0, len(rewards)-1))
@@ -235,15 +236,25 @@ def place8CrowRewards(bundleDataDictionary, mailDataDictionary, questDataDiction
         reward = rewards.pop(random.randint(0, len(rewards)-1))
         questDataDictionary[str(quest)].setRewardOnCompletion(reward.typeString, reward.id, reward.quantity)
         if reward.typeString == "object":
-            hints.append("Completing " + questDataDictionary[str(quest)].name + " quest gives " + objectInfoDict[str(reward.id)].name)
+            hints.append("This just in! Completing " + questDataDictionary[str(quest)].name + " quest gives " + objectInfoDict[str(reward.id)].name)
         else:
-            hints.append("Completing " + questDataDictionary[str(quest)].name + " quest gives " + bigObjectDict[str(reward.id)].name)
+            hints.append("This just in! Completing " + questDataDictionary[str(quest)].name + " quest gives " + bigObjectDict[str(reward.id)].name)
     for id, bundle in bundleDataDictionary.items():
         if not id == "Abandoned Joja Mart/36":
             reward = rewards.pop(random.randint(0, len(rewards)-1))
             bundle.reward = BundleData.BundleReward(reward.typeString, reward.id, reward.quantity)
             if reward.typeString == "object":
-                hints.append("Completing " + bundle.name + " bundle gives " + objectInfoDict[str(reward.id)].name)
+                hints.append("This just in! Completing " + bundle.name + " bundle gives " + objectInfoDict[str(reward.id)].name)
             else:
-                hints.append("Completing " + bundle.name + " bundle gives " + bigObjectDict[str(reward.id)].name)
+                hints.append("This just in! Completing " + bundle.name + " bundle gives " + bigObjectDict[str(reward.id)].name)
     return hints
+
+def setHintsInTipChannel(tipChannelDict, listOfHints):
+    tipChannelKeys = list(tipChannelDict.keys())
+    numHintsToSet = 0
+    if len(tipChannelKeys) < len(listOfHints):
+        numHintsToSet = len(tipChannelKeys)
+    else:
+        numHintsToSet = len(listOfHints)
+    for i in range(numHintsToSet):
+        tipChannelDict[tipChannelKeys[i]].setHintString(listOfHints.pop(random.randint(0, len(listOfHints)-1)))
