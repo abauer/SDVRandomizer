@@ -75,7 +75,7 @@ if __name__ == "__main__":
     bigObjectInfo = readUnpackedXNB(ObjectInfoData.BigObjectInfoData, unpackedFilePath / "Data" / "BigCraftablesInformation.json")
     questSettings = readUnpackedXNB(QuestData.QuestData, unpackedFilePath / "Data" / "Quests.json")
     mailSettings = readUnpackedXNB(MailData.MailData, unpackedFilePath / "Data" / "mail.json")
-    tipChannelSettings = readUnpackedXNB(MailData.MailData, unpackedFilePath / "Data" / "TV" / "TipChannel.json")
+    tipChannelSettings = readUnpackedXNB(TipChannelData.TipChannelData, unpackedFilePath / "Data" / "TV" / "TipChannel.json")
 
     for opt, arg in cmdArgs:
         if opt == "--shuffle-seasons":
@@ -93,9 +93,9 @@ if __name__ == "__main__":
 
     hints = sa.place8CrowRewards(bundleSettings, mailSettings, questSettings, objectInfo, bigObjectInfo)
     sa.setHintsInTipChannel(tipChannelSettings, hints)
+    sa.shuffleBundleRequirements(bundleSettings, objectInfo)
 #    rewards = sa.chooseRewards(bigObjectInfo, objectInfo)
 #    sa.shuffleBundleRewards(bundleSettings, rewards)
-#    sa.shuffleBundleRequirements(bundleSettings, objectInfo)
 
     outputDirectory = Path.cwd() / "bin"
     outputDirectory.mkdir(exist_ok=True)

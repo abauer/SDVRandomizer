@@ -242,7 +242,10 @@ def place8CrowRewards(bundleDataDictionary, mailDataDictionary, questDataDiction
     for id, bundle in bundleDataDictionary.items():
         if not id == "Abandoned Joja Mart/36":
             reward = rewards.pop(random.randint(0, len(rewards)-1))
-            bundle.reward = BundleData.BundleReward(reward.typeString, reward.id, reward.quantity)
+            if reward.typeString == "object":
+                bundle.reward = BundleData.BundleReward("O", reward.id, reward.quantity)
+            else:
+                bundle.reward = BundleData.BundleReward("BO", reward.id, reward.quantity)
             if reward.typeString == "object":
                 hints.append("This just in! Completing " + bundle.name + " bundle gives " + objectInfoDict[str(reward.id)].name)
             else:
