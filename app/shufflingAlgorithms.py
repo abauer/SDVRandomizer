@@ -25,11 +25,16 @@ def getNamesOfVillagers():
     return ['Alex', 'Elliot', 'Harvey', 'Sam', 'Sebastian', 'Shane', 'Abigail', 'Emily', 'Haley', 'Leah', 'Maru', 'Penny', 'Caroline', 'Clint', 'Demetrius', 'Evelyn', 'George', 'Gus', 'Jas', 'Jodi', 'Kent', 'Lewis', 'Linus', 'Marnie', 'Pam', 'Pierre', 'Robin', 'Vincent', 'Willy']
 
 def createMail(nameString, reward, mailDataDictionary):
-    mailDataDictionary[nameString + "_friend"] = "Dear @,^Thank you for beening my friend! I found this and thought you would like it.^  -" + nameString + "%item " + reward.typeString + " " + reward.id + " " + reward.quantity + "%%[#]" + reward.nameString + " Friendship"
+    mailString = ""
+    if reward.typeString == "object":
+        mailString = "Dear @,^Thank you for beening my friend! I found this and thought you would like it.^  -" + nameString + "%item " + reward.typeString + " " + str(reward.id) + " " + str(reward.quantity) + " %%[#]" + nameString + " Friendship"
+    else:
+        mailString = "Dear @,^Thank you for beening my friend! I found this and thought you would like it.^  -" + nameString + "%item " + reward.typeString + " " + str(reward.id) + " %%[#]" + nameString + " Friendship"
+    mailDataDictionary[nameString + "_friend"] = MailData.MailData(nameString + "_friend", mailString)
 
 def createEvent(id, nameString, eventDataDictionary):
     TARGET_FRIENDSHIP_VALUE = 250
-    eventDataDictionary[EventData.generateFriendshipEventID(id, nameString, TARGET_FRIENDSHIP_VALUE)] = EventData(EventData.generateFriendshipEventID(id, nameString, TARGET_FRIENDSHIP_VALUE), "null")
+    eventDataDictionary[EventData.generateFriendshipEventID(id, nameString, TARGET_FRIENDSHIP_VALUE)] = EventData.EventData(EventData.generateFriendshipEventID(id, nameString, TARGET_FRIENDSHIP_VALUE), "null")
 
 # set the season a crop grows in to a random subset of the seasons
 def shuffleCropSeasons(cropDataDictionary):
@@ -178,7 +183,7 @@ def get8CrowRewardsList(objectInfoDict, bigObjectDict):
 
     rewards = []
     for id in listRarecrowID:
-        rewards.append(Reward("bigObject", id, 1))
+        rewards.append(Reward("bigobject", id, 1))
     rewards.append(Reward("object", STARDROP_ID, 1))
     rewards.append(Reward("object", STARDROP_ID, 1))
     rewards.append(Reward("object", STARDROP_ID, 1))
@@ -196,10 +201,10 @@ def get8CrowRewardsList(objectInfoDict, bigObjectDict):
     rewards.append(Reward("object", SEA_DISH_ID, 100))
     rewards.append(Reward("object", MINE_DISH_ID, 100))
     rewards.append(Reward("object", LUCK_DISH_ID, 100))
-    rewards.append(Reward("bigObject", LIGHTNING_ROD_ID, 1))
-    rewards.append(Reward("bigObject", LIGHTNING_ROD_ID, 1))
-    rewards.append(Reward("bigObject", LIGHTNING_ROD_ID, 1))
-    rewards.append(Reward("bigObject", LIGHTNING_ROD_ID, 1))
+    rewards.append(Reward("bigobject", LIGHTNING_ROD_ID, 1))
+    rewards.append(Reward("bigobject", LIGHTNING_ROD_ID, 1))
+    rewards.append(Reward("bigobject", LIGHTNING_ROD_ID, 1))
+    rewards.append(Reward("bigobject", LIGHTNING_ROD_ID, 1))
 
     for id in random.sample(listSeedIDs, 26):
         rewards.append(Reward("object", id, 100))

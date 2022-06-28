@@ -92,11 +92,11 @@ if __name__ == "__main__":
 
     ObjectInfoData.updateCropDescriptions(cropsSettings, objectInfo)
 
-    hints = sa.place8CrowRewards(bundleSettings, mailSettings, questSettings, objectInfo, bigObjectInfo)
+    hints = sa.place8CrowRewards(bundleSettings, mailSettings, eventSettings, objectInfo, bigObjectInfo)
     sa.setHintsInTipChannel(tipChannelSettings, hints)
     sa.shuffleBundleRequirements(bundleSettings, objectInfo)
 
-    outputDirectory = Path.cwd() / "bin" / "assets"|
+    outputDirectory = Path.cwd() / "bin"
     outputDirectory.mkdir(exist_ok=True)
 
     writeDataFile(str(outputDirectory / "randomizedBundles.json"), bundleSettings)
@@ -111,4 +111,4 @@ if __name__ == "__main__":
     writeDataFile(str(outputDirectory / "randomizedMail.json"), mailSettings)
     writeDataFile(str(outputDirectory / "updatedObjectInformation.json"), objectInfo)
     writeDataFile(str(outputDirectory / "updatedTipChannel.json"), tipChannelSettings)
-    ContentJSONHelper.writeContentJSON(Path.cwd() / "bin")
+    ContentJSONHelper.writeContentJSON(outputDirectory)

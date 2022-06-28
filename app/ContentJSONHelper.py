@@ -10,11 +10,9 @@ def generateContentJSONHelper():
         "Data/FarmAnimals" : "assets/randomizedAnimals.json",
         "Data/CookingRecipes" : "assets/randomizedCooking.json",
         "Data/CraftingRecipes" : "assets/randomizedCrafting.json",
-        "Data/Fish" : "assets/randomizedFish.json",
         "Data/fruitTrees" : "assets/randomizedFruitTrees.json",
-        "Data/Locations" : "assets/randomizedLocations.json",
         "Data/mail" : "assets/randomizedMail.json",
-        "Data/Quests" : "assets/randomizedQuests.json",
+        "Data/Events/Farm" : "assets/updatedFarmEvents.json",
         "Data/TV/TipChannel" : "assets/updatedTipChannel.json"
         }
     for target, replacement in replacements.items():
