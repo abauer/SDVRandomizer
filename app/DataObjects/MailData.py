@@ -27,5 +27,7 @@ class MailData:
     def setRewardString(self, typeString, id, quantity):
         if typeString == "money":
             self.itemBlock = "%item money" + str(quantity) + ' ' + str(quantity + 1) + ' %%'
-        else:
+        else if typeString == "object":
             self.itemBlock = "%item " + typeString + ' ' + str(id) + ' ' + str(quantity) + ' %%'
+        else:
+            self.itemBlock = "%item " + typeString + ' ' + str(id) + ' %%'
