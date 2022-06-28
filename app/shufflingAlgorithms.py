@@ -25,9 +25,9 @@ def getNamesOfVillagers():
 def createMail(nameString, reward, mailDataDictionary):
     mailString = ""
     if reward.typeString == "object":
-        mailString = "Dear @,^Thank you for beening my friend! I found this and thought you would like it.^  -" + nameString + "%item " + reward.typeString + " " + str(reward.id) + " " + str(reward.quantity) + " %%[#]" + nameString + " Friendship"
+        mailString = "Dear @,^Thank you for being my friend! I found this and thought you would like it.^  -" + nameString + "%item " + reward.typeString + " " + str(reward.id) + " " + str(reward.quantity) + " %%[#]" + nameString + " Friendship"
     else:
-        mailString = "Dear @,^Thank you for beening my friend! I found this and thought you would like it.^  -" + nameString + "%item " + reward.typeString + " " + str(reward.id) + " %%[#]" + nameString + " Friendship"
+        mailString = "Dear @,^Thank you for being my friend! I found this and thought you would like it.^  -" + nameString + "%item " + reward.typeString + " " + str(reward.id) + " %%[#]" + nameString + " Friendship"
     mailDataDictionary[nameString + "_friend"] = MailData.MailData(nameString + "_friend", mailString)
 
 def createEvent(id, nameString, eventDataDictionary):
