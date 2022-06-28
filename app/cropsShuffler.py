@@ -15,6 +15,7 @@ import DataObjects.LocationData as LocationData
 import DataObjects.QuestData as QuestData
 import DataObjects.MailData as MailData
 import DataObjects.TipChannelData as TipChannelData
+import DataObjects.EventData as EventData
 
 import ContentJSONHelper
 import shufflingAlgorithms as sa
@@ -73,7 +74,7 @@ if __name__ == "__main__":
     locationSettings = readUnpackedXNB(LocationData.LocationData, unpackedFilePath / "Data" / "Locations.json")
     objectInfo = readUnpackedXNB(ObjectInfoData.ObjectInfoData, unpackedFilePath / "Data" / "ObjectInformation.json")
     bigObjectInfo = readUnpackedXNB(ObjectInfoData.BigObjectInfoData, unpackedFilePath / "Data" / "BigCraftablesInformation.json")
-    questSettings = readUnpackedXNB(QuestData.QuestData, unpackedFilePath / "Data" / "Quests.json")
+    eventSettings = readUnpackedXNB(EventData.EventData, unpackedFilePath / "Data" / "Events" / "Farm.json")
     mailSettings = readUnpackedXNB(MailData.MailData, unpackedFilePath / "Data" / "mail.json")
     tipChannelSettings = readUnpackedXNB(TipChannelData.TipChannelData, unpackedFilePath / "Data" / "TV" / "TipChannel.json")
 
@@ -94,10 +95,8 @@ if __name__ == "__main__":
     hints = sa.place8CrowRewards(bundleSettings, mailSettings, questSettings, objectInfo, bigObjectInfo)
     sa.setHintsInTipChannel(tipChannelSettings, hints)
     sa.shuffleBundleRequirements(bundleSettings, objectInfo)
-#    rewards = sa.chooseRewards(bigObjectInfo, objectInfo)
-#    sa.shuffleBundleRewards(bundleSettings, rewards)
 
-    outputDirectory = Path.cwd() / "bin"
+    outputDirectory = Path.cwd() / "bin" / "assets"|
     outputDirectory.mkdir(exist_ok=True)
 
     writeDataFile(str(outputDirectory / "randomizedBundles.json"), bundleSettings)
@@ -108,8 +107,8 @@ if __name__ == "__main__":
     writeDataFile(str(outputDirectory / "randomizedCooking.json"), cookingSettings)
     writeDataFile(str(outputDirectory / "randomizedCrafting.json"), craftingSettings)
     writeDataFile(str(outputDirectory / "randomizedLocations.json"), locationSettings)
-    writeDataFile(str(outputDirectory / "randomizedQuests.json"), questSettings)
+    writeDataFile(str(outputDirectory / "updatedFarmEvents.json"), eventSettings)
     writeDataFile(str(outputDirectory / "randomizedMail.json"), mailSettings)
     writeDataFile(str(outputDirectory / "updatedObjectInformation.json"), objectInfo)
     writeDataFile(str(outputDirectory / "updatedTipChannel.json"), tipChannelSettings)
-    ContentJSONHelper.writeContentJSON(outputDirectory)
+    ContentJSONHelper.writeContentJSON(Path.cwd() / "bin")

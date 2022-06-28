@@ -6,7 +6,7 @@ import DataObjects.FruitTreeData as FruitTrees
 import DataObjects.AnimalData as AnimalData
 import DataObjects.RecipeData as RecipeData
 import DataObjects.LocationData as LocationData
-import DataObjects.QuestData as QuestData
+import DataObjects.EventData as EventData
 import DataObjects.MailData as MailData
 import DataObjects.TipChannelData as TipChannelData
 
@@ -19,6 +19,17 @@ class Reward:
         self.id = id
         self.quantity = quantity
 
+    
+
+def getNamesOfVillagers():
+    return ['Alex', 'Elliot', 'Harvey', 'Sam', 'Sebastian', 'Shane', 'Abigail', 'Emily', 'Haley', 'Leah', 'Maru', 'Penny', 'Caroline', 'Clint', 'Demetrius', 'Evelyn', 'George', 'Gus', 'Jas', 'Jodi', 'Kent', 'Lewis', 'Linus', 'Marnie', 'Pam', 'Pierre', 'Robin', 'Vincent', 'Willy']
+
+def createMail(nameString, reward, mailDataDictionary):
+    mailDataDictionary[nameString + "_friend"] = "Dear @,^Thank you for beening my friend! I found this and thought you would like it.^  -" + nameString + "%item " + reward.typeString + " " + reward.id + " " + reward.quantity + "%%[#]" + reward.nameString + " Friendship"
+
+def createEvent(id, nameString, eventDataDictionary):
+    TARGET_FRIENDSHIP_VALUE = 250
+    eventDataDictionary[EventData.generateFriendshipEventID(id, nameString, TARGET_FRIENDSHIP_VALUE)] = EventData(EventData.generateFriendshipEventID(id, nameString, TARGET_FRIENDSHIP_VALUE), "null")
 
 # set the season a crop grows in to a random subset of the seasons
 def shuffleCropSeasons(cropDataDictionary):
@@ -160,6 +171,7 @@ def get8CrowRewardsList(objectInfoDict, bigObjectDict):
     MINE_DISH_ID = 243
     LUCK_DISH_ID = 204
     LIGHTNING_ROD_ID = 9
+    TRASH_ID = 168
 
     listRarecrowID = [id for id, obj in bigObjectDict.items() if (obj.name == "Rarecrow")]
     listSeedIDs = getAllIDsForCategory(objectInfoDict, SEED_CATEGORY_VALUE)
@@ -186,13 +198,19 @@ def get8CrowRewardsList(objectInfoDict, bigObjectDict):
     rewards.append(Reward("object", LUCK_DISH_ID, 100))
     rewards.append(Reward("bigObject", LIGHTNING_ROD_ID, 1))
     rewards.append(Reward("bigObject", LIGHTNING_ROD_ID, 1))
+    rewards.append(Reward("bigObject", LIGHTNING_ROD_ID, 1))
+    rewards.append(Reward("bigObject", LIGHTNING_ROD_ID, 1))
 
     for id in random.sample(listSeedIDs, 26):
         rewards.append(Reward("object", id, 100))
 
+    #Fill the rest of the slots with trash
+    for i in range(67 - len(rewards)):
+        rewards.append(Reward("object", TRASH_ID, 1))
+
     return rewards
 
-def place8CrowRewards(bundleDataDictionary, mailDataDictionary, questDataDictionary, objectInfoDict, bigObjectDict):
+def place8CrowRewards(bundleDataDictionary, mailDataDictionary, eventDataDictionary, objectInfoDict, bigObjectDict):
     rewards = get8CrowRewardsList(objectInfoDict, bigObjectDict)
     hints = []
 
@@ -232,13 +250,19 @@ def place8CrowRewards(bundleDataDictionary, mailDataDictionary, questDataDiction
             hints.append("Check your mail! " + mail + " gives " + objectInfoDict[str(reward.id)].name)
         else:
             hints.append("Check your mail! " + mail + " gives " + bigObjectDict[str(reward.id)].name)
-    for quest in range(100, 115):
+
+    villagers = getNamesOfVillagers()
+    i = 420
+    for name in villagers:
         reward = rewards.pop(random.randint(0, len(rewards)-1))
-        questDataDictionary[str(quest)].setRewardOnCompletion(reward.typeString, reward.id, reward.quantity)
+        createEvent(i, name, eventDataDictionary)
+        createMail(name, reward, mailDataDictionary)
         if reward.typeString == "object":
-            hints.append("This just in! Completing " + questDataDictionary[str(quest)].name + " quest gives " + objectInfoDict[str(reward.id)].name)
+            hints.append(name + " gives " + objectInfoDict[str(reward.id)].name)
         else:
-            hints.append("This just in! Completing " + questDataDictionary[str(quest)].name + " quest gives " + bigObjectDict[str(reward.id)].name)
+            hints.append(name + " gives " + bigObjectDict[str(reward.id)].name)
+        i = i + 1
+
     for id, bundle in bundleDataDictionary.items():
         if not id == "Abandoned Joja Mart/36":
             reward = rewards.pop(random.randint(0, len(rewards)-1))
