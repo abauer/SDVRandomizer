@@ -19,8 +19,6 @@ class Reward:
         self.id = id
         self.quantity = quantity
 
-    
-
 def getNamesOfVillagers():
     return ['Alex', 'Elliot', 'Harvey', 'Sam', 'Sebastian', 'Shane', 'Abigail', 'Emily', 'Haley', 'Leah', 'Maru', 'Penny', 'Caroline', 'Clint', 'Demetrius', 'Evelyn', 'George', 'Gus', 'Jas', 'Jodi', 'Kent', 'Lewis', 'Linus', 'Marnie', 'Pam', 'Pierre', 'Robin', 'Vincent', 'Willy']
 
@@ -43,6 +41,11 @@ def shuffleCropSeasons(cropDataDictionary):
     for id, cropdata in cropDataDictionary.items():
         numSeasons = random.randint(1, len(seasons))
         cropdata.seasons = random.sample(seasons, numSeasons)
+
+        #Parsnips must always grow in spring
+        if id == "472":
+            if not "spring" in cropdata.seasons:
+                cropdata.seasons.append("spring")
 
 # set all crops to grow in all seasons
 def setAllSeasons(cropDataDictionary):
