@@ -6,8 +6,35 @@ import DataObjects.FruitTreeData as FruitTrees
 import DataObjects.AnimalData as AnimalData
 import DataObjects.RecipeData as RecipeData
 import DataObjects.LocationData as LocationData
+import DataObjects.EventData as EventData
+import DataObjects.MailData as MailData
+import DataObjects.TipChannelData as TipChannelData
 
 import random
+
+class Reward:
+
+    def __init__(self, typeString, id, quantity):
+        self.typeString = typeString
+        self.id = id
+        self.quantity = quantity
+
+    
+
+def getNamesOfVillagers():
+    return ['Alex', 'Elliot', 'Harvey', 'Sam', 'Sebastian', 'Shane', 'Abigail', 'Emily', 'Haley', 'Leah', 'Maru', 'Penny', 'Caroline', 'Clint', 'Demetrius', 'Evelyn', 'George', 'Gus', 'Jas', 'Jodi', 'Kent', 'Lewis', 'Linus', 'Marnie', 'Pam', 'Pierre', 'Robin', 'Vincent', 'Willy']
+
+def createMail(nameString, reward, mailDataDictionary):
+    mailString = ""
+    if reward.typeString == "object":
+        mailString = "Dear @,^Thank you for beening my friend! I found this and thought you would like it.^  -" + nameString + "%item " + reward.typeString + " " + str(reward.id) + " " + str(reward.quantity) + " %%[#]" + nameString + " Friendship"
+    else:
+        mailString = "Dear @,^Thank you for beening my friend! I found this and thought you would like it.^  -" + nameString + "%item " + reward.typeString + " " + str(reward.id) + " %%[#]" + nameString + " Friendship"
+    mailDataDictionary[nameString + "_friend"] = MailData.MailData(nameString + "_friend", mailString)
+
+def createEvent(id, nameString, eventDataDictionary):
+    TARGET_FRIENDSHIP_VALUE = 250
+    eventDataDictionary[EventData.generateFriendshipEventID(id, nameString, TARGET_FRIENDSHIP_VALUE)] = EventData.EventData(EventData.generateFriendshipEventID(id, nameString, TARGET_FRIENDSHIP_VALUE), "null")
 
 # set the season a crop grows in to a random subset of the seasons
 def shuffleCropSeasons(cropDataDictionary):
@@ -75,10 +102,8 @@ def shuffleBundleRewards(bundleDataDictionary, possibleRewards):
         if not id == "Abandoned Joja Mart/36":
             bundleData.reward = possibleRewards.pop(random.randint(0, len(possibleRewards) -1))
 
-# Any basic item with category -15 except radioactive
-# Any basic item with category -28, -16, -27, -26, -7, -75, -81, -4, -6, -5, -18, -79
+# Any basic item with category -15, -28, -16, -27, -26, -7, -75, -81, -4, -6, -5, -18, -79
 # No radioactive, no legend fish (Crimsonfish, Angler, Legend, Glacierfish, Mutant Carp, son of Crimsonfish, ms. Angler, Legend 2, Glacierfish jr., Radioactive carp)
-
 def getAllObjectsForType(objectInfoDict, cat):
     VEGETABLE_ID = -75
     FRUIT_ID = -79
@@ -102,7 +127,7 @@ def getAllObjectsForType(objectInfoDict, cat):
             requirements.append(BundleData.BundleRequirement(id, random.randint(1, 3) * 5, 0))
     return requirements
 
-def shuffleBundleRequirements(bundleDataDictionary, objectInfoDict, options="Crops,Fish,AnimalProd,Cooking,Forage,Artisan,Monster,Ore"):
+def shuffleBundleRequirements(bundleDataDictionary, objectInfoDict, options="Crops,Fish,AnimalProd,Forage,Artisan,Monster,Ore"):
     listOfCategories = []
     if "Crops" in options:
         listOfCategories.append(-75)
@@ -137,4 +162,131 @@ def shuffleBundleRequirements(bundleDataDictionary, objectInfoDict, options="Cro
 
 def setEarlySeedMaker(craftingDictionary):
     craftingDictionary["Seed Maker"].learnLevel = 1
-    
+
+def getAllIDsForCategory(objectInfoDict, catValue):
+    return [int(id) for id, obj in objectInfoDict.items() if (obj.category == catValue)]
+
+def get8CrowRewardsList(objectInfoDict, bigObjectDict):
+    SEED_CATEGORY_VALUE = -74
+    STARDROP_ID = 434
+    FARM_TOTEM_ID = 688
+    ISLAND_TOTEM_ID = 886
+    DESERT_TOTEM_ID = 261
+    SEA_DISH_ID = 242
+    MINE_DISH_ID = 243
+    LUCK_DISH_ID = 204
+    LIGHTNING_ROD_ID = 9
+    TRASH_ID = 168
+
+    listRarecrowID = [id for id, obj in bigObjectDict.items() if (obj.name == "Rarecrow")]
+    listSeedIDs = getAllIDsForCategory(objectInfoDict, SEED_CATEGORY_VALUE)
+
+    rewards = []
+    for id in listRarecrowID:
+        rewards.append(Reward("bigobject", id, 1))
+    rewards.append(Reward("object", STARDROP_ID, 1))
+    rewards.append(Reward("object", STARDROP_ID, 1))
+    rewards.append(Reward("object", STARDROP_ID, 1))
+    rewards.append(Reward("object", STARDROP_ID, 1))
+    rewards.append(Reward("object", STARDROP_ID, 1))
+    rewards.append(Reward("object", FARM_TOTEM_ID, 999))
+    rewards.append(Reward("object", FARM_TOTEM_ID, 999))
+    rewards.append(Reward("object", FARM_TOTEM_ID, 999))
+    rewards.append(Reward("object", ISLAND_TOTEM_ID, 100))
+    rewards.append(Reward("object", ISLAND_TOTEM_ID, 100))
+    rewards.append(Reward("object", ISLAND_TOTEM_ID, 100))
+    rewards.append(Reward("object", DESERT_TOTEM_ID, 100))
+    rewards.append(Reward("object", DESERT_TOTEM_ID, 100))
+    rewards.append(Reward("object", DESERT_TOTEM_ID, 100))
+    rewards.append(Reward("object", SEA_DISH_ID, 100))
+    rewards.append(Reward("object", MINE_DISH_ID, 100))
+    rewards.append(Reward("object", LUCK_DISH_ID, 100))
+    rewards.append(Reward("bigobject", LIGHTNING_ROD_ID, 1))
+    rewards.append(Reward("bigobject", LIGHTNING_ROD_ID, 1))
+    rewards.append(Reward("bigobject", LIGHTNING_ROD_ID, 1))
+    rewards.append(Reward("bigobject", LIGHTNING_ROD_ID, 1))
+
+    for id in random.sample(listSeedIDs, 26):
+        rewards.append(Reward("object", id, 100))
+
+    #Fill the rest of the slots with trash
+    for i in range(67 - len(rewards)):
+        rewards.append(Reward("object", TRASH_ID, 1))
+
+    return rewards
+
+def place8CrowRewards(bundleDataDictionary, mailDataDictionary, eventDataDictionary, objectInfoDict, bigObjectDict):
+    rewards = get8CrowRewardsList(objectInfoDict, bigObjectDict)
+    hints = []
+
+    reward = rewards.pop(random.randint(0, len(rewards)-1))
+    mailDataDictionary["mom1"].setRewardString(reward.typeString, reward.id, reward.quantity)
+    mailDataDictionary["dad1"].setRewardString(reward.typeString, reward.id, reward.quantity)
+    if reward.typeString == "object":
+        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + objectInfoDict[str(reward.id)].name)
+    else:
+        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + bigObjectDict[str(reward.id)].name)
+    reward = rewards.pop(random.randint(0, len(rewards)-1))
+    mailDataDictionary["mom2"].setRewardString(reward.typeString, reward.id, reward.quantity)
+    mailDataDictionary["dad2"].setRewardString(reward.typeString, reward.id, reward.quantity)
+    if reward.typeString == "object":
+        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + objectInfoDict[str(reward.id)].name)
+    else:
+        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + bigObjectDict[str(reward.id)].name)
+    reward = rewards.pop(random.randint(0, len(rewards)-1))
+    mailDataDictionary["mom3"].setRewardString(reward.typeString, reward.id, reward.quantity)
+    mailDataDictionary["dad3"].setRewardString(reward.typeString, reward.id, reward.quantity)
+    if reward.typeString == "object":
+        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + objectInfoDict[str(reward.id)].name)
+    else:
+        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + bigObjectDict[str(reward.id)].name)
+    reward = rewards.pop(random.randint(0, len(rewards)-1))
+    mailDataDictionary["mom4"].setRewardString(reward.typeString, reward.id, reward.quantity)
+    mailDataDictionary["dad4"].setRewardString(reward.typeString, reward.id, reward.quantity)
+    if reward.typeString == "object":
+        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + objectInfoDict[str(reward.id)].name)
+    else:
+        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + bigObjectDict[str(reward.id)].name)
+
+    for mail in ["QiChallengeComplete", "fishing2", "fishing6", "ccBulletinThankYou"]:
+        reward = rewards.pop(random.randint(0, len(rewards)-1))
+        mailDataDictionary[mail].setRewardString(reward.typeString, reward.id, reward.quantity)
+        if reward.typeString == "object":
+            hints.append("Check your mail! " + mail + " gives " + objectInfoDict[str(reward.id)].name)
+        else:
+            hints.append("Check your mail! " + mail + " gives " + bigObjectDict[str(reward.id)].name)
+
+    villagers = getNamesOfVillagers()
+    i = 420
+    for name in villagers:
+        reward = rewards.pop(random.randint(0, len(rewards)-1))
+        createEvent(i, name, eventDataDictionary)
+        createMail(name, reward, mailDataDictionary)
+        if reward.typeString == "object":
+            hints.append(name + " gives " + objectInfoDict[str(reward.id)].name)
+        else:
+            hints.append(name + " gives " + bigObjectDict[str(reward.id)].name)
+        i = i + 1
+
+    for id, bundle in bundleDataDictionary.items():
+        if not id == "Abandoned Joja Mart/36":
+            reward = rewards.pop(random.randint(0, len(rewards)-1))
+            if reward.typeString == "object":
+                bundle.reward = BundleData.BundleReward("O", reward.id, reward.quantity)
+            else:
+                bundle.reward = BundleData.BundleReward("BO", reward.id, reward.quantity)
+            if reward.typeString == "object":
+                hints.append("This just in! Completing " + bundle.name + " bundle gives " + objectInfoDict[str(reward.id)].name)
+            else:
+                hints.append("This just in! Completing " + bundle.name + " bundle gives " + bigObjectDict[str(reward.id)].name)
+    return hints
+
+def setHintsInTipChannel(tipChannelDict, listOfHints):
+    tipChannelKeys = list(tipChannelDict.keys())
+    numHintsToSet = 0
+    if len(tipChannelKeys) < len(listOfHints):
+        numHintsToSet = len(tipChannelKeys)
+    else:
+        numHintsToSet = len(listOfHints)
+    for i in range(numHintsToSet):
+        tipChannelDict[tipChannelKeys[i]].setHintString(listOfHints.pop(random.randint(0, len(listOfHints)-1)))

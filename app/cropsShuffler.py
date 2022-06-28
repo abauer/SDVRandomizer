@@ -12,6 +12,10 @@ import DataObjects.FruitTreeData as FruitTrees
 import DataObjects.AnimalData as AnimalData
 import DataObjects.RecipeData as RecipeData
 import DataObjects.LocationData as LocationData
+import DataObjects.QuestData as QuestData
+import DataObjects.MailData as MailData
+import DataObjects.TipChannelData as TipChannelData
+import DataObjects.EventData as EventData
 
 import ContentJSONHelper
 import shufflingAlgorithms as sa
@@ -70,6 +74,9 @@ if __name__ == "__main__":
     locationSettings = readUnpackedXNB(LocationData.LocationData, unpackedFilePath / "Data" / "Locations.json")
     objectInfo = readUnpackedXNB(ObjectInfoData.ObjectInfoData, unpackedFilePath / "Data" / "ObjectInformation.json")
     bigObjectInfo = readUnpackedXNB(ObjectInfoData.BigObjectInfoData, unpackedFilePath / "Data" / "BigCraftablesInformation.json")
+    eventSettings = readUnpackedXNB(EventData.EventData, unpackedFilePath / "Data" / "Events" / "Farm.json")
+    mailSettings = readUnpackedXNB(MailData.MailData, unpackedFilePath / "Data" / "mail.json")
+    tipChannelSettings = readUnpackedXNB(TipChannelData.TipChannelData, unpackedFilePath / "Data" / "TV" / "TipChannel.json")
 
     for opt, arg in cmdArgs:
         if opt == "--shuffle-seasons":
@@ -84,8 +91,9 @@ if __name__ == "__main__":
             sa.setEarlySeedMaker(craftingSettings)
 
     ObjectInfoData.updateCropDescriptions(cropsSettings, objectInfo)
-    rewards = sa.chooseRewards(bigObjectInfo, objectInfo)
-    sa.shuffleBundleRewards(bundleSettings, rewards)
+
+    hints = sa.place8CrowRewards(bundleSettings, mailSettings, eventSettings, objectInfo, bigObjectInfo)
+    sa.setHintsInTipChannel(tipChannelSettings, hints)
     sa.shuffleBundleRequirements(bundleSettings, objectInfo)
 
     outputDirectory = Path.cwd() / "bin"
@@ -99,5 +107,8 @@ if __name__ == "__main__":
     writeDataFile(str(outputDirectory / "randomizedCooking.json"), cookingSettings)
     writeDataFile(str(outputDirectory / "randomizedCrafting.json"), craftingSettings)
     writeDataFile(str(outputDirectory / "randomizedLocations.json"), locationSettings)
+    writeDataFile(str(outputDirectory / "updatedFarmEvents.json"), eventSettings)
+    writeDataFile(str(outputDirectory / "randomizedMail.json"), mailSettings)
     writeDataFile(str(outputDirectory / "updatedObjectInformation.json"), objectInfo)
+    writeDataFile(str(outputDirectory / "updatedTipChannel.json"), tipChannelSettings)
     ContentJSONHelper.writeContentJSON(outputDirectory)

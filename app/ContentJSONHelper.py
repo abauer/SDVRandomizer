@@ -6,7 +6,14 @@ def generateContentJSONHelper():
     replacements = {
         "Data/Crops" : "assets/randomizedCrops.json", 
         "Data/ObjectInformation" : "assets/updatedObjectInformation.json",
-        "Data/Bundles" : "assets/randomizedBundles.json"
+        "Data/Bundles" : "assets/randomizedBundles.json",
+        "Data/FarmAnimals" : "assets/randomizedAnimals.json",
+        "Data/CookingRecipes" : "assets/randomizedCooking.json",
+        "Data/CraftingRecipes" : "assets/randomizedCrafting.json",
+        "Data/fruitTrees" : "assets/randomizedFruitTrees.json",
+        "Data/mail" : "assets/randomizedMail.json",
+        "Data/Events/Farm" : "assets/updatedFarmEvents.json",
+        "Data/TV/TipChannel" : "assets/updatedTipChannel.json"
         }
     for target, replacement in replacements.items():
         changeDict = { "Action" : "Load", "Target" : target, "FromFile": replacement }
