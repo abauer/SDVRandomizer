@@ -78,38 +78,27 @@ def randomizeHarvestDrops(cropDataDictionary):
         #pop removes and returns the item at the specified index
         cropdata.harvestId = allHarvestIds.pop(random.randint(0, len(allHarvestIds) - 1))
 
-def chooseRewards(bigObjectDict, objectDict, options="8Crow"):
-    listRarecrowID = [id for id, obj in bigObjectDict.items() if (obj.name == "Rarecrow")]
-    listBigObjectID = [id for id, obj in bigObjectDict.items()]
-    listObjectID = [id for id, obj in objectDict.items() if (obj.type in ["Seeds", "Fish", "Crafting"])]
+def chooseSpringCrops(cropDataDictionary, cropIDs):
+    return [crop.harvestId for id, crop in cropDataDictionary.items() if crop.harvestId in cropIDs and "spring" in crop.seasons]
 
-    NUM_BUNDLES_TO_SHUFFLE = 30
-    if "8Crow" in options:
-        NUM_BUNDLES_TO_SHUFFLE = NUM_BUNDLES_TO_SHUFFLE - len(listRarecrowID)
-    numBigRewards = random.randint(0, NUM_BUNDLES_TO_SHUFFLE)
-    numSmallRewards = NUM_BUNDLES_TO_SHUFFLE - numBigRewards
+def chooseSpringFish(locationDataDict, fishIDs):
+    allSpringFish = []
+    for id, location in locationDataDict.items():
+        if not id in ["Temp", "IslandSecret"]:
+            allSpringFish[len(allSpringFish):] = location.springFishIDs
+    return [id for id in fishIDs if id in allSpringFish]
 
-    #remove rarecrows from general pool because we will add them at the end
-    if "8Crow" in options:
-        for id in listRarecrowID:
-            listBigObjectID.remove(id)
-
-    rewards = [BundleData.BundleReward("BO", id, 1) for id in random.sample(listBigObjectID, numBigRewards)]
-    rewards[len(rewards):] = [BundleData.BundleReward("O", id, random.randint(1, 30)) for id in random.sample(listObjectID, numSmallRewards)]
-    if "8Crow" in options:
-        rewards[len(rewards):] = [BundleData.BundleReward("B0", id, 1) for id in listRarecrowID]
-    return rewards
-
-def shuffleBundleRewards(bundleDataDictionary, possibleRewards):
-    for id, bundleData in bundleDataDictionary.items():
-        if not id == "Abandoned Joja Mart/36":
-            bundleData.reward = possibleRewards.pop(random.randint(0, len(possibleRewards) -1))
+def chooseSpringForage(locationDataDict, forageIDs):
+    allSpringForage = []
+    for id, location in locationDataDict.items():
+        if not id in ["Temp", "IslandSecret"]:
+            allSpringForage[len(allSpringForage):] = location.springForageIDs
+    return [forage for forage in forageIDs if forage in allSpringForage]
 
 # Any basic item with category -15, -28, -16, -27, -26, -7, -75, -81, -4, -6, -5, -18, -79
 # No radioactive, no legend fish (Crimsonfish, Angler, Legend, Glacierfish, Mutant Carp, son of Crimsonfish, ms. Angler, Legend 2, Glacierfish jr., Radioactive carp)
-def getAllObjectsForType(objectInfoDict, cat):
+def getAllPossibleRequirementsForType(objectInfoDict, cat):
     VEGETABLE_ID = -75
-    FRUIT_ID = -79
     ORE_ID = -15
     FISH_ID = -4
 
@@ -131,7 +120,52 @@ def getAllObjectsForType(objectInfoDict, cat):
             requirements.append(BundleData.BundleRequirement(id, 1, 0))
     return requirements
 
-def shuffleBundleRequirements(bundleDataDictionary, objectInfoDict, options="Crops,Fish,AnimalProd,Forage,Artisan,Monster,Ore"):
+def getEasyRequirementsForType(objectInfoDict, locationDataDict, cropDataDictionary, cat):
+    VEGETABLE_ID = -75
+    ORE_ID = -15
+    FISH_ID = -4
+    RESOURCE_ID = -16
+    FORAGE_ID = -81
+    EGG_ID = -5
+    MILK_ID = -6
+
+    objects = [int(id) for id, obj in objectInfoDict.items() if (obj.category == cat)]
+    
+    if cat == ORE_ID:
+        #Remove iridium and radioactive
+        for x in [909, 910, 337, 386]:
+            objects.remove(x)
+    elif cat == FISH_ID:
+        #Remove boss fish, void salmon and slimejack
+        for x in [159, 160, 163, 682, 775, 898, 899, 900, 901, 902, 795, 796]:
+            objects.remove(x)
+        objects = chooseSpringFish(locationDataDict, objects)
+    elif cat == RESOURCE_ID:
+        #Remove battery pack
+        objects.remove(787)
+    elif cat == EGG_ID:
+        #Remove ostrich egg, void egg, duck egg and golden egg
+        for x in [928, 289, 305, 442]:
+            objects.remove(x)
+    elif cat == MILK_ID:
+        #Remove goat milk
+        for x in [436, 438]:
+            objects.remove(x)
+    elif cat == FORAGE_ID:
+        objects = chooseSpringForage(locationDataDict, objects)
+    elif cat == VEGETABLE_ID:
+        objects = chooseSpringCrops(cropDataDictionary, objects)
+
+    requirements = []
+    for id in objects:
+        #Set random quality for vegetables
+        if cat in [VEGETABLE_ID]:
+            requirements.append(BundleData.BundleRequirement(id, 1, random.randint(0, 2)))
+        else:
+            requirements.append(BundleData.BundleRequirement(id, 1, 0))
+    return requirements
+
+def getAllPossibleRequirements(objectInfoDict, options):
     listOfCategories = []
     if "Crops" in options:
         listOfCategories.append(-75)
@@ -157,10 +191,42 @@ def shuffleBundleRequirements(bundleDataDictionary, objectInfoDict, options="Cro
 
     requirements = []
     for cat in listOfCategories:
-        requirements[len(requirements):] = getAllObjectsForType(objectInfoDict, cat)
+        requirements[len(requirements):] = getAllPossibleRequirementsForType(objectInfoDict, cat)
+    return requirements
+
+#An easy requirement is something that can be achieved in this first 2 weeks of spring (hopefully :) )
+def getAllEasyRequirements(objectInfoDict, locationDataDict, cropDataDictionary, options):
+    requirements = []
+    listOfCategories= []
+    if "Crops" in options:
+        listOfCategories.append(-75)
+    if "Fish" in options:
+        listOfCategories.append(-4)
+    if "AnimalProd" in options:
+        listOfCategories.append(-6)
+        listOfCategories.append(-5)
+    if "Forage" in options:
+        listOfCategories.append(-16)
+        listOfCategories.append(-81)
+        listOfCategories.append(-27)
+    if "Monster" in options:
+        listOfCategories.append(-28)
+    if "Ore" in options:
+        listOfCategories.append(-15)
+
+    for cat in listOfCategories:
+        requirements[len(requirements):] = getEasyRequirementsForType(objectInfoDict, locationDataDict, cropDataDictionary, cat)
+    return requirements
+
+def shuffleBundleRequirements(bundleDataDictionary, objectInfoDict, locationDataDict, cropDataDictionary, options="Crops,Fish,AnimalProd,Forage,Artisan,Monster,Ore"):
+    requirements = getAllPossibleRequirements(objectInfoDict, options)
+    easyRequirements = getAllEasyRequirements(objectInfoDict, locationDataDict, cropDataDictionary, options)
 
     for id, bundle in bundleDataDictionary.items():
-        if not "Vault" in id:
+        if "Crafts Room" in id:
+            bundle.numRequirementsToComplete = 1
+            bunle.requirements = random.sample(easyRequirements, 4)
+        elif not "Vault" in id:
             bundle.numRequirementsToComplete = 1
             bundle.requirements = random.sample(requirements, 4)
 
