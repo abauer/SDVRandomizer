@@ -124,10 +124,11 @@ def getAllObjectsForType(objectInfoDict, cat):
 
     requirements = []
     for id in objects:
-        if cat in [VEGETABLE_ID, FRUIT_ID]:
-            requirements.append(BundleData.BundleRequirement(id, random.randint(1, 3) * 5, random.randint(0, 2)))
+        #Set random quality for vegetables
+        if cat in [VEGETABLE_ID]:
+            requirements.append(BundleData.BundleRequirement(id, 1, random.randint(0, 2)))
         else:
-            requirements.append(BundleData.BundleRequirement(id, random.randint(1, 3) * 5, 0))
+            requirements.append(BundleData.BundleRequirement(id, 1, 0))
     return requirements
 
 def shuffleBundleRequirements(bundleDataDictionary, objectInfoDict, options="Crops,Fish,AnimalProd,Forage,Artisan,Monster,Ore"):
@@ -160,8 +161,8 @@ def shuffleBundleRequirements(bundleDataDictionary, objectInfoDict, options="Cro
 
     for id, bundle in bundleDataDictionary.items():
         if not "Vault" in id:
-            bundle.numRequirementsToComplete = random.randint(2, 6)
-            bundle.requirements = random.sample(requirements, random.randint(bundle.numRequirementsToComplete, 10))
+            bundle.numRequirementsToComplete = 1
+            bundle.requirements = random.sample(requirements, 4)
 
 def setEarlySeedMaker(craftingDictionary):
     craftingDictionary["Seed Maker"].learnLevel = 1
@@ -179,7 +180,8 @@ def get8CrowRewardsList(objectInfoDict, bigObjectDict):
     MINE_DISH_ID = 243
     LUCK_DISH_ID = 204
     LIGHTNING_ROD_ID = 9
-    TRASH_ID = 168
+    DIAMOND_ID = 72
+    TOTAL_CHECKS = 67
 
     listRarecrowID = [id for id, obj in bigObjectDict.items() if (obj.name == "Rarecrow")]
     listSeedIDs = getAllIDsForCategory(objectInfoDict, SEED_CATEGORY_VALUE)
@@ -212,52 +214,63 @@ def get8CrowRewardsList(objectInfoDict, bigObjectDict):
     for id in random.sample(listSeedIDs, 26):
         rewards.append(Reward("object", id, 100))
 
-    #Fill the rest of the slots with trash
-    for i in range(67 - len(rewards)):
-        rewards.append(Reward("object", TRASH_ID, 1))
+    #Fill the rest of the slots with 100 Diamonds (functions as cash or friendship items)
+    for i in range(TOTAL_CHECKS - len(rewards)):
+        rewards.append(Reward("object", DIAMOND_ID, 100))
 
     return rewards
 
 def place8CrowRewards(bundleDataDictionary, mailDataDictionary, eventDataDictionary, objectInfoDict, bigObjectDict):
     rewards = get8CrowRewardsList(objectInfoDict, bigObjectDict)
     hints = []
+    rewardString = ""
 
     reward = rewards.pop(random.randint(0, len(rewards)-1))
     mailDataDictionary["mom1"].setRewardString(reward.typeString, reward.id, reward.quantity)
     mailDataDictionary["dad1"].setRewardString(reward.typeString, reward.id, reward.quantity)
+
     if reward.typeString == "object":
-        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + objectInfoDict[str(reward.id)].name)
+        rewardString = objectInfoDict[str(reward.id)].name
     else:
-        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + bigObjectDict[str(reward.id)].name)
+        rewardString = bigObjectDict[str(reward.id)].name
+    hints.append("Oh, Mom and Dad are on TV. Sounds like they are sending me " + rewardString)
     reward = rewards.pop(random.randint(0, len(rewards)-1))
     mailDataDictionary["mom2"].setRewardString(reward.typeString, reward.id, reward.quantity)
     mailDataDictionary["dad2"].setRewardString(reward.typeString, reward.id, reward.quantity)
+
     if reward.typeString == "object":
-        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + objectInfoDict[str(reward.id)].name)
+        rewardString = objectInfoDict[str(reward.id)].name
     else:
-        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + bigObjectDict[str(reward.id)].name)
+        rewardString = bigObjectDict[str(reward.id)].name
+    hints.append("Oh, Mom and Dad are on TV. Sounds like they are sending me " + rewardString)
     reward = rewards.pop(random.randint(0, len(rewards)-1))
     mailDataDictionary["mom3"].setRewardString(reward.typeString, reward.id, reward.quantity)
     mailDataDictionary["dad3"].setRewardString(reward.typeString, reward.id, reward.quantity)
+
     if reward.typeString == "object":
-        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + objectInfoDict[str(reward.id)].name)
+        rewardString = objectInfoDict[str(reward.id)].name
     else:
-        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + bigObjectDict[str(reward.id)].name)
+        rewardString = bigObjectDict[str(reward.id)].name
+    hints.append("Oh, Mom and Dad are on TV. Sounds like they are sending me " + rewardString)
     reward = rewards.pop(random.randint(0, len(rewards)-1))
     mailDataDictionary["mom4"].setRewardString(reward.typeString, reward.id, reward.quantity)
     mailDataDictionary["dad4"].setRewardString(reward.typeString, reward.id, reward.quantity)
+
     if reward.typeString == "object":
-        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + objectInfoDict[str(reward.id)].name)
+        rewardString = objectInfoDict[str(reward.id)].name
     else:
-        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + bigObjectDict[str(reward.id)].name)
+        rewardString = bigObjectDict[str(reward.id)].name
+    hints.append("Oh, Mom and Dad are on TV. Sounds like they are sending me " + rewardString)
 
     for mail in ["QiChallengeComplete", "fishing2", "fishing6", "ccBulletinThankYou"]:
         reward = rewards.pop(random.randint(0, len(rewards)-1))
         mailDataDictionary[mail].setRewardString(reward.typeString, reward.id, reward.quantity)
+
         if reward.typeString == "object":
-            hints.append("Check your mail! " + mail + " gives " + objectInfoDict[str(reward.id)].name)
+            rewardString = objectInfoDict[str(reward.id)].name
         else:
-            hints.append("Check your mail! " + mail + " gives " + bigObjectDict[str(reward.id)].name)
+            rewardString = bigObjectDict[str(reward.id)].name
+        hints.append("Check your mail! " + mail + " gives " + rewardString)
 
     villagers = getNamesOfVillagers()
     i = 420
@@ -265,10 +278,13 @@ def place8CrowRewards(bundleDataDictionary, mailDataDictionary, eventDataDiction
         reward = rewards.pop(random.randint(0, len(rewards)-1))
         createEvent(i, name, eventDataDictionary)
         createMail(name, reward, mailDataDictionary)
-        if reward.typeString == "object":
-            hints.append(name + " gives " + objectInfoDict[str(reward.id)].name)
+        if reward.typeString == "money":
+            rewardString = str(reward.quantity) + 'g'
+        elif reward.typeString == "object":
+            rewardString = objectInfoDict[str(reward.id)].name
         else:
-            hints.append(name + " gives " + bigObjectDict[str(reward.id)].name)
+            rewardString = bigObjectDict[str(reward.id)].name
+        hints.append(name + " gives " + rewardString)
         i = i + 1
 
     for id, bundle in bundleDataDictionary.items():
