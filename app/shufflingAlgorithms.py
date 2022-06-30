@@ -225,7 +225,7 @@ def shuffleBundleRequirements(bundleDataDictionary, objectInfoDict, locationData
     for id, bundle in bundleDataDictionary.items():
         if "Crafts Room" in id:
             bundle.numRequirementsToComplete = 1
-            bunle.requirements = random.sample(easyRequirements, 4)
+            bundle.requirements = random.sample(easyRequirements, 4)
         elif not "Vault" in id:
             bundle.numRequirementsToComplete = 1
             bundle.requirements = random.sample(requirements, 4)
