@@ -78,38 +78,27 @@ def randomizeHarvestDrops(cropDataDictionary):
         #pop removes and returns the item at the specified index
         cropdata.harvestId = allHarvestIds.pop(random.randint(0, len(allHarvestIds) - 1))
 
-def chooseRewards(bigObjectDict, objectDict, options="8Crow"):
-    listRarecrowID = [id for id, obj in bigObjectDict.items() if (obj.name == "Rarecrow")]
-    listBigObjectID = [id for id, obj in bigObjectDict.items()]
-    listObjectID = [id for id, obj in objectDict.items() if (obj.type in ["Seeds", "Fish", "Crafting"])]
+def chooseSpringCrops(cropDataDictionary, cropIDs):
+    return [crop.harvestId for id, crop in cropDataDictionary.items() if crop.harvestId in cropIDs and "spring" in crop.seasons]
 
-    NUM_BUNDLES_TO_SHUFFLE = 30
-    if "8Crow" in options:
-        NUM_BUNDLES_TO_SHUFFLE = NUM_BUNDLES_TO_SHUFFLE - len(listRarecrowID)
-    numBigRewards = random.randint(0, NUM_BUNDLES_TO_SHUFFLE)
-    numSmallRewards = NUM_BUNDLES_TO_SHUFFLE - numBigRewards
+def chooseSpringFish(locationDataDict, fishIDs):
+    allSpringFish = []
+    for id, location in locationDataDict.items():
+        if not id in ["Temp", "IslandSecret"]:
+            allSpringFish[len(allSpringFish):] = location.springFishIDs
+    return [id for id in fishIDs if id in allSpringFish]
 
-    #remove rarecrows from general pool because we will add them at the end
-    if "8Crow" in options:
-        for id in listRarecrowID:
-            listBigObjectID.remove(id)
-
-    rewards = [BundleData.BundleReward("BO", id, 1) for id in random.sample(listBigObjectID, numBigRewards)]
-    rewards[len(rewards):] = [BundleData.BundleReward("O", id, random.randint(1, 30)) for id in random.sample(listObjectID, numSmallRewards)]
-    if "8Crow" in options:
-        rewards[len(rewards):] = [BundleData.BundleReward("B0", id, 1) for id in listRarecrowID]
-    return rewards
-
-def shuffleBundleRewards(bundleDataDictionary, possibleRewards):
-    for id, bundleData in bundleDataDictionary.items():
-        if not id == "Abandoned Joja Mart/36":
-            bundleData.reward = possibleRewards.pop(random.randint(0, len(possibleRewards) -1))
+def chooseSpringForage(locationDataDict, forageIDs):
+    allSpringForage = []
+    for id, location in locationDataDict.items():
+        if not id in ["Temp", "IslandSecret"]:
+            allSpringForage[len(allSpringForage):] = location.springForageIDs
+    return [forage for forage in forageIDs if forage in allSpringForage]
 
 # Any basic item with category -15, -28, -16, -27, -26, -7, -75, -81, -4, -6, -5, -18, -79
 # No radioactive, no legend fish (Crimsonfish, Angler, Legend, Glacierfish, Mutant Carp, son of Crimsonfish, ms. Angler, Legend 2, Glacierfish jr., Radioactive carp)
-def getAllObjectsForType(objectInfoDict, cat):
+def getAllPossibleRequirementsForType(objectInfoDict, cat):
     VEGETABLE_ID = -75
-    FRUIT_ID = -79
     ORE_ID = -15
     FISH_ID = -4
 
@@ -124,13 +113,59 @@ def getAllObjectsForType(objectInfoDict, cat):
 
     requirements = []
     for id in objects:
-        if cat in [VEGETABLE_ID, FRUIT_ID]:
-            requirements.append(BundleData.BundleRequirement(id, random.randint(1, 3) * 5, random.randint(0, 2)))
+        #Set random quality for vegetables
+        if cat in [VEGETABLE_ID]:
+            requirements.append(BundleData.BundleRequirement(id, 1, random.randint(0, 2)))
         else:
-            requirements.append(BundleData.BundleRequirement(id, random.randint(1, 3) * 5, 0))
+            requirements.append(BundleData.BundleRequirement(id, 1, 0))
     return requirements
 
-def shuffleBundleRequirements(bundleDataDictionary, objectInfoDict, options="Crops,Fish,AnimalProd,Forage,Artisan,Monster,Ore"):
+def getEasyRequirementsForType(objectInfoDict, locationDataDict, cropDataDictionary, cat):
+    VEGETABLE_ID = -75
+    ORE_ID = -15
+    FISH_ID = -4
+    RESOURCE_ID = -16
+    FORAGE_ID = -81
+    EGG_ID = -5
+    MILK_ID = -6
+
+    objects = [int(id) for id, obj in objectInfoDict.items() if (obj.category == cat)]
+    
+    if cat == ORE_ID:
+        #Remove iridium and radioactive
+        for x in [909, 910, 337, 386]:
+            objects.remove(x)
+    elif cat == FISH_ID:
+        #Remove boss fish, void salmon and slimejack
+        for x in [159, 160, 163, 682, 775, 898, 899, 900, 901, 902, 795, 796]:
+            objects.remove(x)
+        objects = chooseSpringFish(locationDataDict, objects)
+    elif cat == RESOURCE_ID:
+        #Remove battery pack
+        objects.remove(787)
+    elif cat == EGG_ID:
+        #Remove ostrich egg, void egg, duck egg and golden egg
+        for x in [928, 289, 305, 442]:
+            objects.remove(x)
+    elif cat == MILK_ID:
+        #Remove goat milk
+        for x in [436, 438]:
+            objects.remove(x)
+    elif cat == FORAGE_ID:
+        objects = chooseSpringForage(locationDataDict, objects)
+    elif cat == VEGETABLE_ID:
+        objects = chooseSpringCrops(cropDataDictionary, objects)
+
+    requirements = []
+    for id in objects:
+        #Set random quality for vegetables
+        if cat in [VEGETABLE_ID]:
+            requirements.append(BundleData.BundleRequirement(id, 1, random.randint(0, 2)))
+        else:
+            requirements.append(BundleData.BundleRequirement(id, 1, 0))
+    return requirements
+
+def getAllPossibleRequirements(objectInfoDict, options):
     listOfCategories = []
     if "Crops" in options:
         listOfCategories.append(-75)
@@ -156,12 +191,44 @@ def shuffleBundleRequirements(bundleDataDictionary, objectInfoDict, options="Cro
 
     requirements = []
     for cat in listOfCategories:
-        requirements[len(requirements):] = getAllObjectsForType(objectInfoDict, cat)
+        requirements[len(requirements):] = getAllPossibleRequirementsForType(objectInfoDict, cat)
+    return requirements
+
+#An easy requirement is something that can be achieved in this first 2 weeks of spring (hopefully :) )
+def getAllEasyRequirements(objectInfoDict, locationDataDict, cropDataDictionary, options):
+    requirements = []
+    listOfCategories= []
+    if "Crops" in options:
+        listOfCategories.append(-75)
+    if "Fish" in options:
+        listOfCategories.append(-4)
+    if "AnimalProd" in options:
+        listOfCategories.append(-6)
+        listOfCategories.append(-5)
+    if "Forage" in options:
+        listOfCategories.append(-16)
+        listOfCategories.append(-81)
+        listOfCategories.append(-27)
+    if "Monster" in options:
+        listOfCategories.append(-28)
+    if "Ore" in options:
+        listOfCategories.append(-15)
+
+    for cat in listOfCategories:
+        requirements[len(requirements):] = getEasyRequirementsForType(objectInfoDict, locationDataDict, cropDataDictionary, cat)
+    return requirements
+
+def shuffleBundleRequirements(bundleDataDictionary, objectInfoDict, locationDataDict, cropDataDictionary, options="Crops,Fish,AnimalProd,Forage,Artisan,Monster,Ore"):
+    requirements = getAllPossibleRequirements(objectInfoDict, options)
+    easyRequirements = getAllEasyRequirements(objectInfoDict, locationDataDict, cropDataDictionary, options)
 
     for id, bundle in bundleDataDictionary.items():
-        if not "Vault" in id:
-            bundle.numRequirementsToComplete = random.randint(2, 6)
-            bundle.requirements = random.sample(requirements, random.randint(bundle.numRequirementsToComplete, 10))
+        if "Crafts Room" in id:
+            bundle.numRequirementsToComplete = 1
+            bundle.requirements = random.sample(easyRequirements, 4)
+        elif not "Vault" in id:
+            bundle.numRequirementsToComplete = 1
+            bundle.requirements = random.sample(requirements, 4)
 
 def setEarlySeedMaker(craftingDictionary):
     craftingDictionary["Seed Maker"].learnLevel = 1
@@ -179,7 +246,8 @@ def get8CrowRewardsList(objectInfoDict, bigObjectDict):
     MINE_DISH_ID = 243
     LUCK_DISH_ID = 204
     LIGHTNING_ROD_ID = 9
-    TRASH_ID = 168
+    DIAMOND_ID = 72
+    TOTAL_CHECKS = 67
 
     listRarecrowID = [id for id, obj in bigObjectDict.items() if (obj.name == "Rarecrow")]
     listSeedIDs = getAllIDsForCategory(objectInfoDict, SEED_CATEGORY_VALUE)
@@ -212,52 +280,63 @@ def get8CrowRewardsList(objectInfoDict, bigObjectDict):
     for id in random.sample(listSeedIDs, 26):
         rewards.append(Reward("object", id, 100))
 
-    #Fill the rest of the slots with trash
-    for i in range(67 - len(rewards)):
-        rewards.append(Reward("object", TRASH_ID, 1))
+    #Fill the rest of the slots with 100 Diamonds (functions as cash or friendship items)
+    for i in range(TOTAL_CHECKS - len(rewards)):
+        rewards.append(Reward("object", DIAMOND_ID, 100))
 
     return rewards
 
 def place8CrowRewards(bundleDataDictionary, mailDataDictionary, eventDataDictionary, objectInfoDict, bigObjectDict):
     rewards = get8CrowRewardsList(objectInfoDict, bigObjectDict)
     hints = []
+    rewardString = ""
 
     reward = rewards.pop(random.randint(0, len(rewards)-1))
     mailDataDictionary["mom1"].setRewardString(reward.typeString, reward.id, reward.quantity)
     mailDataDictionary["dad1"].setRewardString(reward.typeString, reward.id, reward.quantity)
+
     if reward.typeString == "object":
-        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + objectInfoDict[str(reward.id)].name)
+        rewardString = objectInfoDict[str(reward.id)].name
     else:
-        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + bigObjectDict[str(reward.id)].name)
+        rewardString = bigObjectDict[str(reward.id)].name
+    hints.append("Oh, Mom and Dad are on TV. Sounds like they are sending me " + rewardString)
     reward = rewards.pop(random.randint(0, len(rewards)-1))
     mailDataDictionary["mom2"].setRewardString(reward.typeString, reward.id, reward.quantity)
     mailDataDictionary["dad2"].setRewardString(reward.typeString, reward.id, reward.quantity)
+
     if reward.typeString == "object":
-        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + objectInfoDict[str(reward.id)].name)
+        rewardString = objectInfoDict[str(reward.id)].name
     else:
-        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + bigObjectDict[str(reward.id)].name)
+        rewardString = bigObjectDict[str(reward.id)].name
+    hints.append("Oh, Mom and Dad are on TV. Sounds like they are sending me " + rewardString)
     reward = rewards.pop(random.randint(0, len(rewards)-1))
     mailDataDictionary["mom3"].setRewardString(reward.typeString, reward.id, reward.quantity)
     mailDataDictionary["dad3"].setRewardString(reward.typeString, reward.id, reward.quantity)
+
     if reward.typeString == "object":
-        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + objectInfoDict[str(reward.id)].name)
+        rewardString = objectInfoDict[str(reward.id)].name
     else:
-        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + bigObjectDict[str(reward.id)].name)
+        rewardString = bigObjectDict[str(reward.id)].name
+    hints.append("Oh, Mom and Dad are on TV. Sounds like they are sending me " + rewardString)
     reward = rewards.pop(random.randint(0, len(rewards)-1))
     mailDataDictionary["mom4"].setRewardString(reward.typeString, reward.id, reward.quantity)
     mailDataDictionary["dad4"].setRewardString(reward.typeString, reward.id, reward.quantity)
+
     if reward.typeString == "object":
-        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + objectInfoDict[str(reward.id)].name)
+        rewardString = objectInfoDict[str(reward.id)].name
     else:
-        hints.append("Oh, mom and dad are on TV. Sounds like they are sending me " + bigObjectDict[str(reward.id)].name)
+        rewardString = bigObjectDict[str(reward.id)].name
+    hints.append("Oh, Mom and Dad are on TV. Sounds like they are sending me " + rewardString)
 
     for mail in ["QiChallengeComplete", "fishing2", "fishing6", "ccBulletinThankYou"]:
         reward = rewards.pop(random.randint(0, len(rewards)-1))
         mailDataDictionary[mail].setRewardString(reward.typeString, reward.id, reward.quantity)
+
         if reward.typeString == "object":
-            hints.append("Check your mail! " + mail + " gives " + objectInfoDict[str(reward.id)].name)
+            rewardString = objectInfoDict[str(reward.id)].name
         else:
-            hints.append("Check your mail! " + mail + " gives " + bigObjectDict[str(reward.id)].name)
+            rewardString = bigObjectDict[str(reward.id)].name
+        hints.append("Check your mail! " + mail + " gives " + rewardString)
 
     villagers = getNamesOfVillagers()
     i = 420
@@ -265,10 +344,13 @@ def place8CrowRewards(bundleDataDictionary, mailDataDictionary, eventDataDiction
         reward = rewards.pop(random.randint(0, len(rewards)-1))
         createEvent(i, name, eventDataDictionary)
         createMail(name, reward, mailDataDictionary)
-        if reward.typeString == "object":
-            hints.append(name + " gives " + objectInfoDict[str(reward.id)].name)
+        if reward.typeString == "money":
+            rewardString = str(reward.quantity) + 'g'
+        elif reward.typeString == "object":
+            rewardString = objectInfoDict[str(reward.id)].name
         else:
-            hints.append(name + " gives " + bigObjectDict[str(reward.id)].name)
+            rewardString = bigObjectDict[str(reward.id)].name
+        hints.append(name + " gives " + rewardString)
         i = i + 1
 
     for id, bundle in bundleDataDictionary.items():

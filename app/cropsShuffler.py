@@ -92,9 +92,9 @@ if __name__ == "__main__":
 
     ObjectInfoData.updateCropDescriptions(cropsSettings, objectInfo)
 
+    sa.shuffleBundleRequirements(bundleSettings, objectInfo, locationSettings, cropsSettings)
     hints = sa.place8CrowRewards(bundleSettings, mailSettings, eventSettings, objectInfo, bigObjectInfo)
     sa.setHintsInTipChannel(tipChannelSettings, hints)
-    sa.shuffleBundleRequirements(bundleSettings, objectInfo)
 
     outputDirectory = Path.cwd() / "bin"
     outputDirectory.mkdir(exist_ok=True)
