@@ -41,7 +41,12 @@ class LocationData:
         else:
             stringList = []
             for i in range(len(idList)):
-                stringList.append(str(idList[i]) + ' ' + str(chanceList[i]))
+                chanceString = ""
+                if chanceList[i].is_integer():
+                    chanceString = str(int(chanceList[i]))
+                else:
+                    chanceString = str(chanceList[i])[1:]
+                stringList.append(str(idList[i]) + ' ' + chanceString)
             return ' '.join(stringList)
 
     def parseSettingString(self, settingString):

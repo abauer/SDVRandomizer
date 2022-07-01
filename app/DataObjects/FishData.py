@@ -55,7 +55,10 @@ class FishData:
         settingsStrings.append(self.name)
         if self.canCatchWithTrap:
             settingsStrings.append("trap")
-            settingsStrings.append(str(self.trapChance))
+            if self.trapChance == 0:
+                settingsStrings.append("0")
+            else:
+                settingsStrings.append(str(self.trapChance)[1:])
             settingsStrings.append(self.fishLocationAndChance)
             settingsStrings.append(self.trapLocation)
             settingsStrings.append(str(self.minSize))
@@ -70,8 +73,14 @@ class FishData:
             settingsStrings.append(self.weather)
             settingsStrings.append(self.fishLocationAndChance)
             settingsStrings.append(str(self.maxDepth))
-            settingsStrings.append(str(self.spawnMultiplier))
-            settingsStrings.append(str(self.depthMultiplier))
+            if self.spawnMultiplier == 0:
+                settingsStrings.append("0")
+            else:
+                settingsStrings.append(str(self.spawnMultiplier)[1:])
+            if self.depthMultiplier == 0:
+                settingsStrings.append("0")
+            else:
+                settingsStrings.append(str(self.depthMultiplier)[1:])
             settingsStrings.append(str(self.minFishingLevel))
 
         return "/".join(settingsStrings)

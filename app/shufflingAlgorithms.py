@@ -97,12 +97,16 @@ def chooseSpringForage(locationDataDict, forageIDs):
 
 # Any basic item with category -15, -28, -16, -27, -26, -7, -75, -81, -4, -6, -5, -18, -79
 # No radioactive, no legend fish (Crimsonfish, Angler, Legend, Glacierfish, Mutant Carp, son of Crimsonfish, ms. Angler, Legend 2, Glacierfish jr., Radioactive carp)
-def getAllPossibleRequirementsForType(objectInfoDict, cat):
+def getAllPossibleRequirementsForType(objectInfoDict, cropDataDictionary, cat):
     VEGETABLE_ID = -75
     ORE_ID = -15
     FISH_ID = -4
 
     objects = [int(id) for id, obj in objectInfoDict.items() if (obj.category == cat)]
+
+    #Make sure that all crops that we choose from will be in the seed
+    if cat == VEGETABLE_ID:
+        objects = [crop.harvestId for id, crop in cropDataDictionary.items()]
     
     if cat == ORE_ID:
         for x in [909, 910]:
@@ -165,7 +169,7 @@ def getEasyRequirementsForType(objectInfoDict, locationDataDict, cropDataDiction
             requirements.append(BundleData.BundleRequirement(id, 1, 0))
     return requirements
 
-def getAllPossibleRequirements(objectInfoDict, options):
+def getAllPossibleRequirements(objectInfoDict, cropDataDictionary, options):
     listOfCategories = []
     if "Crops" in options:
         listOfCategories.append(-75)
@@ -191,7 +195,7 @@ def getAllPossibleRequirements(objectInfoDict, options):
 
     requirements = []
     for cat in listOfCategories:
-        requirements[len(requirements):] = getAllPossibleRequirementsForType(objectInfoDict, cat)
+        requirements[len(requirements):] = getAllPossibleRequirementsForType(objectInfoDict, cropDataDictionary, cat)
     return requirements
 
 #An easy requirement is something that can be achieved in this first 2 weeks of spring (hopefully :) )
@@ -219,7 +223,7 @@ def getAllEasyRequirements(objectInfoDict, locationDataDict, cropDataDictionary,
     return requirements
 
 def shuffleBundleRequirements(bundleDataDictionary, objectInfoDict, locationDataDict, cropDataDictionary, options="Crops,Fish,AnimalProd,Forage,Artisan,Monster,Ore"):
-    requirements = getAllPossibleRequirements(objectInfoDict, options)
+    requirements = getAllPossibleRequirements(objectInfoDict, cropDataDictionary, options)
     easyRequirements = getAllEasyRequirements(objectInfoDict, locationDataDict, cropDataDictionary, options)
 
     for id, bundle in bundleDataDictionary.items():
@@ -277,7 +281,7 @@ def get8CrowRewardsList(objectInfoDict, bigObjectDict):
     rewards.append(Reward("bigobject", LIGHTNING_ROD_ID, 1))
     rewards.append(Reward("bigobject", LIGHTNING_ROD_ID, 1))
 
-    for id in random.sample(listSeedIDs, 26):
+    for id in random.sample(listSeedIDs, 20):
         rewards.append(Reward("object", id, 100))
 
     #Fill the rest of the slots with 100 Diamonds (functions as cash or friendship items)
