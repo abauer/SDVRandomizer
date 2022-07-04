@@ -240,7 +240,7 @@ def setEarlySeedMaker(craftingDictionary):
 def getAllIDsForCategory(objectInfoDict, catValue):
     return [int(id) for id, obj in objectInfoDict.items() if (obj.category == catValue)]
 
-def get8CrowRewardsList(objectInfoDict, bigObjectDict):
+def get8CrowRewardsList(objectInfoDict, bigObjectDict, numVillagers):
     SEED_CATEGORY_VALUE = -74
     STARDROP_ID = 434
     FARM_TOTEM_ID = 688
@@ -249,9 +249,10 @@ def get8CrowRewardsList(objectInfoDict, bigObjectDict):
     SEA_DISH_ID = 242
     MINE_DISH_ID = 243
     LUCK_DISH_ID = 204
+    CRAB_CAKE_ID = 732
     LIGHTNING_ROD_ID = 9
     DIAMOND_ID = 72
-    TOTAL_CHECKS = 67
+    TOTAL_CHECKS = 38 + numVillagers
 
     listRarecrowID = [id for id, obj in bigObjectDict.items() if (obj.name == "Rarecrow")]
     listSeedIDs = getAllIDsForCategory(objectInfoDict, SEED_CATEGORY_VALUE)
@@ -276,12 +277,12 @@ def get8CrowRewardsList(objectInfoDict, bigObjectDict):
     rewards.append(Reward("object", SEA_DISH_ID, 100))
     rewards.append(Reward("object", MINE_DISH_ID, 100))
     rewards.append(Reward("object", LUCK_DISH_ID, 100))
-    rewards.append(Reward("bigobject", LIGHTNING_ROD_ID, 1))
+    rewards.append(Reward("object", CRAB_CAKE_ID, 100))
     rewards.append(Reward("bigobject", LIGHTNING_ROD_ID, 1))
     rewards.append(Reward("bigobject", LIGHTNING_ROD_ID, 1))
     rewards.append(Reward("bigobject", LIGHTNING_ROD_ID, 1))
 
-    for id in random.sample(listSeedIDs, 20):
+    for id in random.sample(listSeedIDs, numVillagers):
         rewards.append(Reward("object", id, 100))
 
     #Fill the rest of the slots with 100 Diamonds (functions as cash or friendship items)
@@ -290,8 +291,8 @@ def get8CrowRewardsList(objectInfoDict, bigObjectDict):
 
     return rewards
 
-def place8CrowRewards(bundleDataDictionary, mailDataDictionary, eventDataDictionary, objectInfoDict, bigObjectDict):
-    rewards = get8CrowRewardsList(objectInfoDict, bigObjectDict)
+def place8CrowRewards(bundleDataDictionary, mailDataDictionary, eventDataDictionary, objectInfoDict, bigObjectDict, numVillagers):
+    rewards = get8CrowRewardsList(objectInfoDict, bigObjectDict, numVillagers)
     hints = []
     rewardString = ""
 
@@ -344,7 +345,7 @@ def place8CrowRewards(bundleDataDictionary, mailDataDictionary, eventDataDiction
 
     villagers = getNamesOfVillagers()
     i = 420
-    for name in villagers:
+    for name in random.sample(villagers, numVillagers):
         reward = rewards.pop(random.randint(0, len(rewards)-1))
         createEvent(i, name, eventDataDictionary)
         createMail(name, reward, mailDataDictionary)

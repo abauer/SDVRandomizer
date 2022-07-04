@@ -40,7 +40,7 @@ def writeDataFile(filepath, settingsDictionary):
 def parseArgs(argv):
 
     try:
-        opts, extra = getopt.getopt(argv[1:], "", ["shuffle-seasons", "all-seasons", "short-growth", "shuffle-harvest", "earlySeedMaker", "random-seed=", "Unpacked-folder="])
+        opts, extra = getopt.getopt(argv[1:], "", ["shuffle-seasons", "all-seasons", "short-growth", "shuffle-harvest", "earlySeedMaker", "numVillagers=", "random-seed=", "Unpacked-folder="])
     except getopt.GetoptError as err:
         print(err)
         sys.exit(2)
@@ -78,6 +78,7 @@ if __name__ == "__main__":
     mailSettings = readUnpackedXNB(MailData.MailData, unpackedFilePath / "Data" / "mail.json")
     tipChannelSettings = readUnpackedXNB(TipChannelData.TipChannelData, unpackedFilePath / "Data" / "TV" / "TipChannel.json")
 
+    numVillagers = 29
     for opt, arg in cmdArgs:
         if opt == "--shuffle-seasons":
             sa.shuffleCropSeasons(cropsSettings)
@@ -89,6 +90,8 @@ if __name__ == "__main__":
             sa.randomizeHarvestDrops(cropsSettings)
         elif opt == "--earlySeedMaker":
             sa.setEarlySeedMaker(craftingSettings)
+        elif opt == "--numVillagers":
+            numVillagers = arg
 
     ObjectInfoData.updateCropDescriptions(cropsSettings, objectInfo)
 
