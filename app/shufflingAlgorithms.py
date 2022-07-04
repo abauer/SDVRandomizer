@@ -355,7 +355,7 @@ def place8CrowRewards(bundleDataDictionary, mailDataDictionary, eventDataDiction
             rewardString = objectInfoDict[str(reward.id)].name
         else:
             rewardString = bigObjectDict[str(reward.id)].name
-        hints.append(name + " gives " + rewardString)
+        hints.append(name + " here! I'll give ya " + rewardString + " if you help me out.")
         i = i + 1
 
     for id, bundle in bundleDataDictionary.items():
