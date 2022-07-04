@@ -40,7 +40,7 @@ def writeDataFile(filepath, settingsDictionary):
 def parseArgs(argv):
 
     try:
-        opts, extra = getopt.getopt(argv[1:], "", ["shuffle-seasons", "all-seasons", "short-growth", "shuffle-harvest", "earlySeedMaker", "numVillagers=", "random-seed=", "Unpacked-folder="])
+        opts, extra = getopt.getopt(argv[1:], "", ["shuffle-seasons", "all-seasons", "short-growth", "shuffle-harvest", "earlySeedMaker", "shuffle-fish", "shuffle-forage", "numVillagers=", "random-seed=", "Unpacked-folder="])
     except getopt.GetoptError as err:
         print(err)
         sys.exit(2)
@@ -79,6 +79,8 @@ if __name__ == "__main__":
     tipChannelSettings = readUnpackedXNB(TipChannelData.TipChannelData, unpackedFilePath / "Data" / "TV" / "TipChannel.json")
 
     numVillagers = 29
+    shuffledFish = []
+    shuffledForage = []
     for opt, arg in cmdArgs:
         if opt == "--shuffle-seasons":
             sa.shuffleCropSeasons(cropsSettings)
@@ -92,12 +94,19 @@ if __name__ == "__main__":
             sa.setEarlySeedMaker(craftingSettings)
         elif opt == "--numVillagers":
             numVillagers = arg
+        elif opt == "--shuffle-fish":
+            shuffledFish = sa.randomizeFish(locationSettings, objectInfo)
 
-    ObjectInfoData.updateCropDescriptions(cropsSettings, objectInfo)
+    # Make sure we shuffle the forage after any crop shuffling
+    for opt, arg in cmdArgs:
+        if opt == "--shuffle-forage":
+            listOfIDs = [req.id for req in sa.getAllPossibleRequirements(objectInfo, cropsSettings, shuffledFish, "Fish,AnimalProd,Forage,Artisan")]
+            shuffledForage = sa.randomizeForage(locationSettings, listOfIDs)
 
-    sa.shuffleBundleRequirements(bundleSettings, objectInfo, locationSettings, cropsSettings)
-    hints = sa.place8CrowRewards(bundleSettings, mailSettings, eventSettings, objectInfo, bigObjectInfo)
+    sa.shuffleBundleRequirements(bundleSettings, objectInfo, locationSettings, cropsSettings, shuffledFish)
+    hints = sa.place8CrowRewards(bundleSettings, mailSettings, eventSettings, objectInfo, bigObjectInfo, numVillagers)
     sa.setHintsInTipChannel(tipChannelSettings, hints)
+    ObjectInfoData.updateCropDescriptions(cropsSettings, objectInfo)
 
     outputDirectory = Path.cwd() / "bin"
     outputDirectory.mkdir(exist_ok=True)

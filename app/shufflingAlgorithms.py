@@ -95,9 +95,17 @@ def chooseSpringForage(locationDataDict, forageIDs):
             allSpringForage[len(allSpringForage):] = location.springForageIDs
     return [forage for forage in forageIDs if forage in allSpringForage]
 
+def getFishForRandomizing(objectInfoDict):
+    FISH_ID = -4
+    objects = [int(id) for id, obj in objectInfoDict.items() if (obj.category == FISH_ID)]
+
+    for x in [159, 160, 163, 682, 775, 898, 899, 900, 901, 902]:
+        objects.remove(x)
+    return objects
+
 # Any basic item with category -15, -28, -16, -27, -26, -7, -75, -81, -4, -6, -5, -18, -79
 # No radioactive, no legend fish (Crimsonfish, Angler, Legend, Glacierfish, Mutant Carp, son of Crimsonfish, ms. Angler, Legend 2, Glacierfish jr., Radioactive carp)
-def getAllPossibleRequirementsForType(objectInfoDict, cropDataDictionary, cat):
+def getAllPossibleRequirementsForType(objectInfoDict, cropDataDictionary, shuffledFishIDs, cat):
     VEGETABLE_ID = -75
     ORE_ID = -15
     FISH_ID = -4
@@ -107,12 +115,14 @@ def getAllPossibleRequirementsForType(objectInfoDict, cropDataDictionary, cat):
     #Make sure that all crops that we choose from will be in the seed
     if cat == VEGETABLE_ID:
         objects = [crop.harvestId for id, crop in cropDataDictionary.items()]
-    
+
+    if cat == FISH_ID and len(shuffledFishIDs) > 0:
+        objects = shuffledFishIDs
+    elif cat == FISH_ID and len(shuffledFishIDs) == 0:
+        objects = getFishForRandomizing(objectInfoDict)
+
     if cat == ORE_ID:
         for x in [909, 910]:
-            objects.remove(x)
-    elif cat == FISH_ID:
-        for x in [159, 160, 163, 682, 775, 898, 899, 900, 901, 902]:
             objects.remove(x)
 
     requirements = []
@@ -169,7 +179,7 @@ def getEasyRequirementsForType(objectInfoDict, locationDataDict, cropDataDiction
             requirements.append(BundleData.BundleRequirement(id, 1, 0))
     return requirements
 
-def getAllPossibleRequirements(objectInfoDict, cropDataDictionary, options):
+def getAllPossibleRequirements(objectInfoDict, cropDataDictionary, shuffledFishIDs, options):
     listOfCategories = []
     if "Crops" in options:
         listOfCategories.append(-75)
@@ -195,7 +205,7 @@ def getAllPossibleRequirements(objectInfoDict, cropDataDictionary, options):
 
     requirements = []
     for cat in listOfCategories:
-        requirements[len(requirements):] = getAllPossibleRequirementsForType(objectInfoDict, cropDataDictionary, cat)
+        requirements[len(requirements):] = getAllPossibleRequirementsForType(objectInfoDict, cropDataDictionary, shuffledFishIDs, cat)
     return requirements
 
 #An easy requirement is something that can be achieved in this first 2 weeks of spring (hopefully :) )
@@ -222,8 +232,8 @@ def getAllEasyRequirements(objectInfoDict, locationDataDict, cropDataDictionary,
         requirements[len(requirements):] = getEasyRequirementsForType(objectInfoDict, locationDataDict, cropDataDictionary, cat)
     return requirements
 
-def shuffleBundleRequirements(bundleDataDictionary, objectInfoDict, locationDataDict, cropDataDictionary, options="Crops,Fish,AnimalProd,Forage,Artisan,Monster,Ore"):
-    requirements = getAllPossibleRequirements(objectInfoDict, cropDataDictionary, options)
+def shuffleBundleRequirements(bundleDataDictionary, objectInfoDict, locationDataDict, cropDataDictionary, shuffledFishIDs, options="Crops,Fish,AnimalProd,Forage,Artisan,Monster,Ore"):
+    requirements = getAllPossibleRequirements(objectInfoDict, cropDataDictionary, shuffledFishIDs, options)
     easyRequirements = getAllEasyRequirements(objectInfoDict, locationDataDict, cropDataDictionary, options)
 
     for id, bundle in bundleDataDictionary.items():
@@ -380,3 +390,42 @@ def setHintsInTipChannel(tipChannelDict, listOfHints):
         numHintsToSet = len(listOfHints)
     for i in range(numHintsToSet):
         tipChannelDict[tipChannelKeys[i]].setHintString(listOfHints.pop(random.randint(0, len(listOfHints)-1)))
+
+def randomizeFish(locationDataDict, objectInfoDict):
+    fishList = []
+    fishIDList = getFishForRandomizing(objectInfoDict)
+    for id, location in locationDataDict.items():
+        if not id in ["Temp"]:
+            if len(location.springFishChance) > 0:
+                location.springFishIDs = random.sample(fishIDList, len(location.springFishIDs))
+                fishList = fishList + location.springFishIDs
+            if len(location.summerFishChance) > 0:
+                location.summerFishIDs = random.sample(fishIDList, len(location.summerFishIDs))
+                fishList = fishList + location.summerFishIDs
+            if len(location.fallFishChance) > 0:
+                location.fallFishIDs = random.sample(fishIDList, len(location.fallFishIDs))
+                fishList = fishList + location.fallFishIDs
+            if len(location.winterFishChance) > 0:
+                location.winterFishIDs = random.sample(fishIDList, len(location.winterFishIDs))
+                fishList = fishList + location.winterFishIDs
+    #Convert to a set to uniquify the list
+    return list(set(fishList))
+
+def randomizeForage(locationDataDict, forageIDList):
+    forage = []
+    for id, location in locationDataDict.items():
+        if not id in ["Temp"]:
+            if len(location.springForageChance) > 0:
+                location.springForageIDs = random.sample(forageIDList, len(location.springForageIDs))
+                forage = forage + location.springForageIDs
+            if len(location.summerForageChance) > 0:
+                location.summerForageIDs = random.sample(forageIDList, len(location.summerForageIDs))
+                forage = forage + location.summerForageIDs
+            if len(location.fallForageChance) > 0:
+                location.fallForageIDs = random.sample(forageIDList, len(location.fallForageIDs))
+                forage = forage + location.fallForageIDs
+            if len(location.winterForageChance) > 0:
+                location.winterForageIDs = random.sample(forageIDList, len(location.winterForageIDs))
+                forage = forage + location.winterForageIDs
+    #Convert to a set to uniquify the list
+    return list(set(forage))    
