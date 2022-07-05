@@ -93,7 +93,7 @@ if __name__ == "__main__":
         elif opt == "--earlySeedMaker":
             sa.setEarlySeedMaker(craftingSettings)
         elif opt == "--numVillagers":
-            numVillagers = arg
+            numVillagers = int(arg)
         elif opt == "--shuffle-fish":
             shuffledFish = sa.randomizeFish(locationSettings, fishSettings)
 
