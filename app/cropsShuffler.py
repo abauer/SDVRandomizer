@@ -95,15 +95,15 @@ if __name__ == "__main__":
         elif opt == "--numVillagers":
             numVillagers = arg
         elif opt == "--shuffle-fish":
-            shuffledFish = sa.randomizeFish(locationSettings, objectInfo)
+            shuffledFish = sa.randomizeFish(locationSettings, fishSettings)
 
     # Make sure we shuffle the forage after any crop shuffling
     for opt, arg in cmdArgs:
         if opt == "--shuffle-forage":
-            listOfIDs = [req.id for req in sa.getAllPossibleRequirements(objectInfo, cropsSettings, shuffledFish, "Fish,AnimalProd,Forage,Artisan")]
+            listOfIDs = [req.id for req in sa.getAllPossibleRequirements(objectInfo, cropsSettings, fishSettings, shuffledFish, "Fish,AnimalProd,Forage,Artisan")]
             shuffledForage = sa.randomizeForage(locationSettings, listOfIDs)
 
-    sa.shuffleBundleRequirements(bundleSettings, objectInfo, locationSettings, cropsSettings, shuffledFish)
+    sa.shuffleBundleRequirements(bundleSettings, objectInfo, locationSettings, cropsSettings, fishSettings, shuffledFish)
     hints = sa.place8CrowRewards(bundleSettings, mailSettings, eventSettings, objectInfo, bigObjectInfo, numVillagers)
     sa.setHintsInTipChannel(tipChannelSettings, hints)
     ObjectInfoData.updateCropDescriptions(cropsSettings, objectInfo)

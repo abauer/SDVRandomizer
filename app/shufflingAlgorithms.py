@@ -84,7 +84,7 @@ def chooseSpringCrops(cropDataDictionary, cropIDs):
 def chooseSpringFish(locationDataDict, fishIDs):
     allSpringFish = []
     for id, location in locationDataDict.items():
-        if not id in ["Temp", "IslandSecret"]:
+        if not id in ["Temp", "IslandSecret", "Woods", "Sewer", "BugLand", "WitchSwamp", "fishingGame"]:
             allSpringFish[len(allSpringFish):] = location.springFishIDs
     return [id for id in fishIDs if id in allSpringFish]
 
@@ -95,9 +95,8 @@ def chooseSpringForage(locationDataDict, forageIDs):
             allSpringForage[len(allSpringForage):] = location.springForageIDs
     return [forage for forage in forageIDs if forage in allSpringForage]
 
-def getFishForRandomizing(objectInfoDict):
-    FISH_ID = -4
-    objects = [int(id) for id, obj in objectInfoDict.items() if (obj.category == FISH_ID)]
+def getFishForRandomizing(fishDataDict):
+    objects = [int(id) for id, obj in fishDataDict.items() if not obj.canCatchWithTrap]
 
     for x in [159, 160, 163, 682, 775, 898, 899, 900, 901, 902]:
         objects.remove(x)
@@ -105,7 +104,7 @@ def getFishForRandomizing(objectInfoDict):
 
 # Any basic item with category -15, -28, -16, -27, -26, -7, -75, -81, -4, -6, -5, -18, -79
 # No radioactive, no legend fish (Crimsonfish, Angler, Legend, Glacierfish, Mutant Carp, son of Crimsonfish, ms. Angler, Legend 2, Glacierfish jr., Radioactive carp)
-def getAllPossibleRequirementsForType(objectInfoDict, cropDataDictionary, shuffledFishIDs, cat):
+def getAllPossibleRequirementsForType(objectInfoDict, cropDataDictionary, fishDataDictionary, shuffledFishIDs, cat):
     VEGETABLE_ID = -75
     ORE_ID = -15
     FISH_ID = -4
@@ -119,7 +118,7 @@ def getAllPossibleRequirementsForType(objectInfoDict, cropDataDictionary, shuffl
     if cat == FISH_ID and len(shuffledFishIDs) > 0:
         objects = shuffledFishIDs
     elif cat == FISH_ID and len(shuffledFishIDs) == 0:
-        objects = getFishForRandomizing(objectInfoDict)
+        objects = getFishForRandomizing(fishDataDictionary)
 
     if cat == ORE_ID:
         for x in [909, 910]:
@@ -179,7 +178,7 @@ def getEasyRequirementsForType(objectInfoDict, locationDataDict, cropDataDiction
             requirements.append(BundleData.BundleRequirement(id, 1, 0))
     return requirements
 
-def getAllPossibleRequirements(objectInfoDict, cropDataDictionary, shuffledFishIDs, options):
+def getAllPossibleRequirements(objectInfoDict, cropDataDictionary, fishDataDictionary, shuffledFishIDs, options):
     listOfCategories = []
     if "Crops" in options:
         listOfCategories.append(-75)
@@ -205,7 +204,7 @@ def getAllPossibleRequirements(objectInfoDict, cropDataDictionary, shuffledFishI
 
     requirements = []
     for cat in listOfCategories:
-        requirements[len(requirements):] = getAllPossibleRequirementsForType(objectInfoDict, cropDataDictionary, shuffledFishIDs, cat)
+        requirements[len(requirements):] = getAllPossibleRequirementsForType(objectInfoDict, cropDataDictionary, fishDataDictionary, shuffledFishIDs, cat)
     return requirements
 
 #An easy requirement is something that can be achieved in this first 2 weeks of spring (hopefully :) )
@@ -232,8 +231,8 @@ def getAllEasyRequirements(objectInfoDict, locationDataDict, cropDataDictionary,
         requirements[len(requirements):] = getEasyRequirementsForType(objectInfoDict, locationDataDict, cropDataDictionary, cat)
     return requirements
 
-def shuffleBundleRequirements(bundleDataDictionary, objectInfoDict, locationDataDict, cropDataDictionary, shuffledFishIDs, options="Crops,Fish,AnimalProd,Forage,Artisan,Monster,Ore"):
-    requirements = getAllPossibleRequirements(objectInfoDict, cropDataDictionary, shuffledFishIDs, options)
+def shuffleBundleRequirements(bundleDataDictionary, objectInfoDict, locationDataDict, cropDataDictionary, fishDataDictionary, shuffledFishIDs, options="Crops,Fish,AnimalProd,Forage,Artisan,Monster,Ore"):
+    requirements = getAllPossibleRequirements(objectInfoDict, cropDataDictionary, fishDataDictionary, shuffledFishIDs, options)
     easyRequirements = getAllEasyRequirements(objectInfoDict, locationDataDict, cropDataDictionary, options)
 
     for id, bundle in bundleDataDictionary.items():
@@ -391,9 +390,9 @@ def setHintsInTipChannel(tipChannelDict, listOfHints):
     for i in range(numHintsToSet):
         tipChannelDict[tipChannelKeys[i]].setHintString(listOfHints.pop(random.randint(0, len(listOfHints)-1)))
 
-def randomizeFish(locationDataDict, objectInfoDict):
+def randomizeFish(locationDataDict, fishDataDict):
     fishList = []
-    fishIDList = getFishForRandomizing(objectInfoDict)
+    fishIDList = getFishForRandomizing(fishDataDict)
     for id, location in locationDataDict.items():
         if not id in ["Temp"]:
             if len(location.springFishChance) > 0:
@@ -414,7 +413,7 @@ def randomizeFish(locationDataDict, objectInfoDict):
 def randomizeForage(locationDataDict, forageIDList):
     forage = []
     for id, location in locationDataDict.items():
-        if not id in ["Temp"]:
+        if not id in ["Temp", ]:
             if len(location.springForageChance) > 0:
                 location.springForageIDs = random.sample(forageIDList, len(location.springForageIDs))
                 forage = forage + location.springForageIDs
