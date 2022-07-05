@@ -84,7 +84,7 @@ def chooseSpringCrops(cropDataDictionary, cropIDs):
 def chooseSpringFish(locationDataDict, fishIDs):
     allSpringFish = []
     for id, location in locationDataDict.items():
-        if not id in ["Temp", "IslandSecret"]:
+        if not id in ["Temp", "IslandSecret", "Woods", "Sewer", "BugLand", "WitchSwamp", "fishingGame"]:
             allSpringFish[len(allSpringFish):] = location.springFishIDs
     return [id for id in fishIDs if id in allSpringFish]
 
@@ -95,9 +95,16 @@ def chooseSpringForage(locationDataDict, forageIDs):
             allSpringForage[len(allSpringForage):] = location.springForageIDs
     return [forage for forage in forageIDs if forage in allSpringForage]
 
+def getFishForRandomizing(fishDataDict):
+    objects = [int(id) for id, obj in fishDataDict.items() if not obj.canCatchWithTrap]
+
+    for x in [159, 160, 163, 682, 775, 898, 899, 900, 901, 902]:
+        objects.remove(x)
+    return objects
+
 # Any basic item with category -15, -28, -16, -27, -26, -7, -75, -81, -4, -6, -5, -18, -79
 # No radioactive, no legend fish (Crimsonfish, Angler, Legend, Glacierfish, Mutant Carp, son of Crimsonfish, ms. Angler, Legend 2, Glacierfish jr., Radioactive carp)
-def getAllPossibleRequirementsForType(objectInfoDict, cropDataDictionary, cat):
+def getAllPossibleRequirementsForType(objectInfoDict, cropDataDictionary, fishDataDictionary, shuffledFishIDs, cat):
     VEGETABLE_ID = -75
     ORE_ID = -15
     FISH_ID = -4
@@ -107,12 +114,14 @@ def getAllPossibleRequirementsForType(objectInfoDict, cropDataDictionary, cat):
     #Make sure that all crops that we choose from will be in the seed
     if cat == VEGETABLE_ID:
         objects = [crop.harvestId for id, crop in cropDataDictionary.items()]
-    
+
+    if cat == FISH_ID and len(shuffledFishIDs) > 0:
+        objects = shuffledFishIDs
+    elif cat == FISH_ID and len(shuffledFishIDs) == 0:
+        objects = getFishForRandomizing(fishDataDictionary)
+
     if cat == ORE_ID:
         for x in [909, 910]:
-            objects.remove(x)
-    elif cat == FISH_ID:
-        for x in [159, 160, 163, 682, 775, 898, 899, 900, 901, 902]:
             objects.remove(x)
 
     requirements = []
@@ -169,7 +178,7 @@ def getEasyRequirementsForType(objectInfoDict, locationDataDict, cropDataDiction
             requirements.append(BundleData.BundleRequirement(id, 1, 0))
     return requirements
 
-def getAllPossibleRequirements(objectInfoDict, cropDataDictionary, options):
+def getAllPossibleRequirements(objectInfoDict, cropDataDictionary, fishDataDictionary, shuffledFishIDs, options):
     listOfCategories = []
     if "Crops" in options:
         listOfCategories.append(-75)
@@ -195,7 +204,7 @@ def getAllPossibleRequirements(objectInfoDict, cropDataDictionary, options):
 
     requirements = []
     for cat in listOfCategories:
-        requirements[len(requirements):] = getAllPossibleRequirementsForType(objectInfoDict, cropDataDictionary, cat)
+        requirements[len(requirements):] = getAllPossibleRequirementsForType(objectInfoDict, cropDataDictionary, fishDataDictionary, shuffledFishIDs, cat)
     return requirements
 
 #An easy requirement is something that can be achieved in this first 2 weeks of spring (hopefully :) )
@@ -222,8 +231,8 @@ def getAllEasyRequirements(objectInfoDict, locationDataDict, cropDataDictionary,
         requirements[len(requirements):] = getEasyRequirementsForType(objectInfoDict, locationDataDict, cropDataDictionary, cat)
     return requirements
 
-def shuffleBundleRequirements(bundleDataDictionary, objectInfoDict, locationDataDict, cropDataDictionary, options="Crops,Fish,AnimalProd,Forage,Artisan,Monster,Ore"):
-    requirements = getAllPossibleRequirements(objectInfoDict, cropDataDictionary, options)
+def shuffleBundleRequirements(bundleDataDictionary, objectInfoDict, locationDataDict, cropDataDictionary, fishDataDictionary, shuffledFishIDs, options="Crops,Fish,AnimalProd,Forage,Artisan,Monster,Ore"):
+    requirements = getAllPossibleRequirements(objectInfoDict, cropDataDictionary, fishDataDictionary, shuffledFishIDs, options)
     easyRequirements = getAllEasyRequirements(objectInfoDict, locationDataDict, cropDataDictionary, options)
 
     for id, bundle in bundleDataDictionary.items():
@@ -240,7 +249,7 @@ def setEarlySeedMaker(craftingDictionary):
 def getAllIDsForCategory(objectInfoDict, catValue):
     return [int(id) for id, obj in objectInfoDict.items() if (obj.category == catValue)]
 
-def get8CrowRewardsList(objectInfoDict, bigObjectDict):
+def get8CrowRewardsList(objectInfoDict, bigObjectDict, numVillagers):
     SEED_CATEGORY_VALUE = -74
     STARDROP_ID = 434
     FARM_TOTEM_ID = 688
@@ -249,9 +258,10 @@ def get8CrowRewardsList(objectInfoDict, bigObjectDict):
     SEA_DISH_ID = 242
     MINE_DISH_ID = 243
     LUCK_DISH_ID = 204
+    CRAB_CAKE_ID = 732
     LIGHTNING_ROD_ID = 9
     DIAMOND_ID = 72
-    TOTAL_CHECKS = 67
+    TOTAL_CHECKS = 38 + numVillagers
 
     listRarecrowID = [id for id, obj in bigObjectDict.items() if (obj.name == "Rarecrow")]
     listSeedIDs = getAllIDsForCategory(objectInfoDict, SEED_CATEGORY_VALUE)
@@ -276,12 +286,12 @@ def get8CrowRewardsList(objectInfoDict, bigObjectDict):
     rewards.append(Reward("object", SEA_DISH_ID, 100))
     rewards.append(Reward("object", MINE_DISH_ID, 100))
     rewards.append(Reward("object", LUCK_DISH_ID, 100))
-    rewards.append(Reward("bigobject", LIGHTNING_ROD_ID, 1))
+    rewards.append(Reward("object", CRAB_CAKE_ID, 100))
     rewards.append(Reward("bigobject", LIGHTNING_ROD_ID, 1))
     rewards.append(Reward("bigobject", LIGHTNING_ROD_ID, 1))
     rewards.append(Reward("bigobject", LIGHTNING_ROD_ID, 1))
 
-    for id in random.sample(listSeedIDs, 20):
+    for id in random.sample(listSeedIDs, numVillagers):
         rewards.append(Reward("object", id, 100))
 
     #Fill the rest of the slots with 100 Diamonds (functions as cash or friendship items)
@@ -290,8 +300,8 @@ def get8CrowRewardsList(objectInfoDict, bigObjectDict):
 
     return rewards
 
-def place8CrowRewards(bundleDataDictionary, mailDataDictionary, eventDataDictionary, objectInfoDict, bigObjectDict):
-    rewards = get8CrowRewardsList(objectInfoDict, bigObjectDict)
+def place8CrowRewards(bundleDataDictionary, mailDataDictionary, eventDataDictionary, objectInfoDict, bigObjectDict, numVillagers):
+    rewards = get8CrowRewardsList(objectInfoDict, bigObjectDict, numVillagers)
     hints = []
     rewardString = ""
 
@@ -344,7 +354,7 @@ def place8CrowRewards(bundleDataDictionary, mailDataDictionary, eventDataDiction
 
     villagers = getNamesOfVillagers()
     i = 420
-    for name in villagers:
+    for name in random.sample(villagers, numVillagers):
         reward = rewards.pop(random.randint(0, len(rewards)-1))
         createEvent(i, name, eventDataDictionary)
         createMail(name, reward, mailDataDictionary)
@@ -354,7 +364,7 @@ def place8CrowRewards(bundleDataDictionary, mailDataDictionary, eventDataDiction
             rewardString = objectInfoDict[str(reward.id)].name
         else:
             rewardString = bigObjectDict[str(reward.id)].name
-        hints.append(name + " gives " + rewardString)
+        hints.append(name + " here! I'll give ya " + rewardString + " if you help me out.")
         i = i + 1
 
     for id, bundle in bundleDataDictionary.items():
@@ -379,3 +389,42 @@ def setHintsInTipChannel(tipChannelDict, listOfHints):
         numHintsToSet = len(listOfHints)
     for i in range(numHintsToSet):
         tipChannelDict[tipChannelKeys[i]].setHintString(listOfHints.pop(random.randint(0, len(listOfHints)-1)))
+
+def randomizeFish(locationDataDict, fishDataDict):
+    fishList = []
+    fishIDList = getFishForRandomizing(fishDataDict)
+    for id, location in locationDataDict.items():
+        if not id in ["Temp"]:
+            if len(location.springFishChance) > 0:
+                location.springFishIDs = random.sample(fishIDList, len(location.springFishIDs))
+                fishList = fishList + location.springFishIDs
+            if len(location.summerFishChance) > 0:
+                location.summerFishIDs = random.sample(fishIDList, len(location.summerFishIDs))
+                fishList = fishList + location.summerFishIDs
+            if len(location.fallFishChance) > 0:
+                location.fallFishIDs = random.sample(fishIDList, len(location.fallFishIDs))
+                fishList = fishList + location.fallFishIDs
+            if len(location.winterFishChance) > 0:
+                location.winterFishIDs = random.sample(fishIDList, len(location.winterFishIDs))
+                fishList = fishList + location.winterFishIDs
+    #Convert to a set to uniquify the list
+    return list(set(fishList))
+
+def randomizeForage(locationDataDict, forageIDList):
+    forage = []
+    for id, location in locationDataDict.items():
+        if not id in ["Temp", ]:
+            if len(location.springForageChance) > 0:
+                location.springForageIDs = random.sample(forageIDList, len(location.springForageIDs))
+                forage = forage + location.springForageIDs
+            if len(location.summerForageChance) > 0:
+                location.summerForageIDs = random.sample(forageIDList, len(location.summerForageIDs))
+                forage = forage + location.summerForageIDs
+            if len(location.fallForageChance) > 0:
+                location.fallForageIDs = random.sample(forageIDList, len(location.fallForageIDs))
+                forage = forage + location.fallForageIDs
+            if len(location.winterForageChance) > 0:
+                location.winterForageIDs = random.sample(forageIDList, len(location.winterForageIDs))
+                forage = forage + location.winterForageIDs
+    #Convert to a set to uniquify the list
+    return list(set(forage))    
