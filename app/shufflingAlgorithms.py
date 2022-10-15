@@ -529,4 +529,4 @@ def place8CrowRewardsV2(bundleDataDictionary, mailDataDictionary, eventDataDicti
         else:
             hints.append("There are no Rarecrows in the " + b + " bundles.")
 
-    return hints
+    return hints 
