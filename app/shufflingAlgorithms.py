@@ -427,4 +427,106 @@ def randomizeForage(locationDataDict, forageIDList):
                 location.winterForageIDs = random.sample(forageIDList, len(location.winterForageIDs))
                 forage = forage + location.winterForageIDs
     #Convert to a set to uniquify the list
-    return list(set(forage))    
+    return list(set(forage))
+
+#Uses a different hint system than 
+def place8CrowRewardsV2(bundleDataDictionary, mailDataDictionary, eventDataDictionary, objectInfoDict, bigObjectDict, numVillagers):
+    rewards = get8CrowRewardsList(objectInfoDict, bigObjectDict, numVillagers)
+    hints = []
+    RARECROW_IDS = [110, 113, 126, 136, 137, 138, 139, 140]
+    rewardString = ""
+    rarecrowPlaced = False
+
+    reward = rewards.pop(random.randint(0, len(rewards)-1))
+    if reward.typeString != "object" and reward.id in RARECROW_IDS:
+        rarecrowPlaced = True
+    mailDataDictionary["mom1"].setRewardString(reward.typeString, reward.id, reward.quantity)
+    mailDataDictionary["dad1"].setRewardString(reward.typeString, reward.id, reward.quantity)
+
+    reward = rewards.pop(random.randint(0, len(rewards)-1))
+    if reward.typeString != "object" and reward.id in RARECROW_IDS:
+        rarecrowPlaced = True
+    mailDataDictionary["mom2"].setRewardString(reward.typeString, reward.id, reward.quantity)
+    mailDataDictionary["dad2"].setRewardString(reward.typeString, reward.id, reward.quantity)
+
+    reward = rewards.pop(random.randint(0, len(rewards)-1))
+    if reward.typeString != "object" and reward.id in RARECROW_IDS:
+        rarecrowPlaced = True
+    mailDataDictionary["mom3"].setRewardString(reward.typeString, reward.id, reward.quantity)
+    mailDataDictionary["dad3"].setRewardString(reward.typeString, reward.id, reward.quantity)
+
+    reward = rewards.pop(random.randint(0, len(rewards)-1))
+    if reward.typeString != "object" and reward.id in RARECROW_IDS:
+        rarecrowPlaced = True
+    mailDataDictionary["mom4"].setRewardString(reward.typeString, reward.id, reward.quantity)
+    mailDataDictionary["dad4"].setRewardString(reward.typeString, reward.id, reward.quantity)
+
+    if rarecrowPlaced:
+        hints.append("Your grandfather gave a Rarecrow to your parents to give you when you are ready. Check your mail!")
+        rarecrowPlaced = False
+    else:
+        hints.append("Mail from your parents does not give a Rarecrow")
+
+    for mail in ["fishing2", "fishing6"]:
+        reward = rewards.pop(random.randint(0, len(rewards)-1))
+        mailDataDictionary[mail].setRewardString(reward.typeString, reward.id, reward.quantity)
+
+        if reward.typeString != "object" and reward.id in RARECROW_IDS:
+            rarecrowPlaced = True
+
+    if rarecrowPlaced:
+        hints.append("Did I ever tell you about the time your grandfather caught a Rarecrow while fishing? He was reel talented, he was.")
+        rarecrowPlaced = False
+    else:
+        hints.append("There are no rarecrows from fishing levels")
+
+    reward = rewards.pop(random.randint(0, len(rewards)-1))
+    mailDataDictionary["QiChallengeComplete"].setRewardString(reward.typeString, reward.id, reward.quantity)
+
+    if reward.typeString != "object" and reward.id in RARECROW_IDS:
+        hints.append("Did I ever tell you about the time your grandfather completed Qi's challenge? He told me he found a Rarecrow at the end of it.")
+    else:
+        hints.append("Qi's Challenge does not give a Rarecrow.")
+
+    reward = rewards.pop(random.randint(0, len(rewards)-1))
+    mailDataDictionary["ccBulletinThankYou"].setRewardString(reward.typeString, reward.id, reward.quantity)
+
+    if reward.typeString != "object" and reward.id in RARECROW_IDS:
+        hints.append("Did I ever tell you about the time your grandfather completed all the bulletin board bundles? Mayor Lewis was so happy he gave your grandfather a Rarecrow.")
+    else:
+        hints.append("The bulletin board thank you letter does not contain a Rarecrow.")
+        
+    villagers = getNamesOfVillagers()
+    i = 420
+    for name in random.sample(villagers, numVillagers):
+        reward = rewards.pop(random.randint(0, len(rewards)-1))
+        createEvent(i, name, eventDataDictionary)
+        createMail(name, reward, mailDataDictionary)
+        if reward.typeString != "object" and reward.id in RARECROW_IDS:
+            rarecrowPlaced = True
+        i += 1
+
+    if rarecrowPlaced:
+        hints.append("Did I ever tell you about the time your grandfather helped the villagers? They were so greatful, they gave him a Rarecrow.")
+        rarecrowPlaced = False
+    else:
+        hints.append("Villager friendship does not give a Rarecrow.")
+
+    importantBundles = { "Pantry":False, "Fish Tank":False, "Crafts Room":False, "Boiler Room":False, "Vault":False, "Bulletin Board":False}
+    for id, bundle in bundleDataDictionary.items():
+        if not id == "Abandoned Joja Mart/36":
+            reward = rewards.pop(random.randint(0, len(rewards)-1))
+            if reward.typeString == "object":
+                bundle.reward = BundleData.BundleReward("O", reward.id, reward.quantity)
+            else:
+                bundle.reward = BundleData.BundleReward("BO", reward.id, reward.quantity)
+                if reward.id in RARECROW_IDS:
+                    importantBundles[id.split('/')[0]] = True
+
+    for b, isImportant in importantBundles.items():
+        if isImportant:
+            hints.append("Your grandfather put a Rarecrow in one of the " + b + " bundles.")
+        else:
+            hints.append("There are no Rarecrows in the " + b + " bundles.")
+
+    return hints
