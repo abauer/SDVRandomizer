@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>SDV Crops Randomizer</title>
+   </head>
+   <body>
+      <h1>SDV Crops Randomizer</h1>
+      <h2>Configure Randomizer Settings</h2>
+      <form action="./cropShuffler.php" method="post">
+         <fieldset name="RandomizedLocations">
+            <legend>Randomized Items</legend>
+            <p>Shuffle Crop Harvest<input type="checkbox" name="harvestShuffle" value="--shuffle-harvest"></p>
+            <p>Shuffle Forage<input type="checkbox" name="forageShuffle" value="--shuffle-forage"> </p>
+            <p>Shuffle Fish<input type="checkbox" name="fishShuffle" value="--shuffle-fish"></p>
+            <p>Number of Villagers<br> <input type="range" id="numVill" name="numVillagers" min="0" max="29" step="1"></p>
+            <p>Crop grow season settings</p>
+            <select name="CropSeasons">
+               <option value="">Vanilla Crop Seasons</option>
+               <option value="--shuffle-seasons">Shuffle Crop Seasons</option>
+               <option value="--all-seasons">All Seasons</option>
+            </select>
+         </fieldset>
+         <fieldset name="miscSettings">
+            <legend>Misc Settings</legend>
+            <p>Shorten Crop Growth<input type="checkbox" name="basicSettings" value="--short-growth"></p>
+            <p>Early Seed Maker<input type="checkbox" name="basicSettings" value="--early-seed-maker"></p>
+         </fieldset>
+         <br>
+         <input type="submit" value="Generate Seed">
+      </form>
+   </body>
+</html>
