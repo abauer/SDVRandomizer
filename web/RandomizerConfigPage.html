@@ -1,32 +1,65 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
-   <head>
-      <title>SDV Crops Randomizer</title>
-   </head>
-   <body>
-      <h1>SDV Crops Randomizer</h1>
-      <h2>Configure Randomizer Settings</h2>
-      <form action="./cropShuffler.php" method="post">
-         <fieldset name="RandomizedLocations">
-            <legend>Randomized Items</legend>
-            <p>Shuffle Crop Harvest<input type="checkbox" name="harvestShuffle" value="--shuffle-harvest"></p>
-            <p>Shuffle Forage<input type="checkbox" name="forageShuffle" value="--shuffle-forage"> </p>
-            <p>Shuffle Fish<input type="checkbox" name="fishShuffle" value="--shuffle-fish"></p>
-            <p>Number of Villagers<br> <input type="range" id="numVill" name="numVillagers" min="0" max="29" step="1"></p>
-            <p>Crop grow season settings</p>
-            <select name="CropSeasons">
-               <option value="">Vanilla Crop Seasons</option>
-               <option value="--shuffle-seasons">Shuffle Crop Seasons</option>
-               <option value="--all-seasons">All Seasons</option>
-            </select>
-         </fieldset>
-         <fieldset name="miscSettings">
-            <legend>Misc Settings</legend>
-            <p>Shorten Crop Growth<input type="checkbox" name="basicSettings" value="--short-growth"></p>
-            <p>Early Seed Maker<input type="checkbox" name="basicSettings" value="--early-seed-maker"></p>
-         </fieldset>
-         <br>
-         <input type="submit" value="Generate Seed">
-      </form>
-   </body>
+<head>
+<title>SDV Crops Randomizer</title>
+<meta charset="UTF-8">
+<meta property="og:title" content="SDV Crops Randomizer">
+<meta property="og:description" content="An app which allows you to randomize your Stardew Valley game.">
+<meta property="theme-color" content="#ffe0b0">
+<meta property="og:image" content="{% static 'og-embed-image.png' %}">
+<meta property="twitter:image" content="{% static 'og-embed-image.png' %}">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" type="text/css" href="{% static 'randomizerConfig.css' %}">
+<link rel="icon" type="image/png" href="{% static 'favicon_p.png' %}">
+<!--
+<link rel="stylesheet" type="text/css" href="{% static 'wallpaper.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'shirt.css' %}">
+-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+	window.jQuery || document.write('<script src="./jquery-3.2.1.min.js"><\/script>')
+</script>
+<script src="{% static 'randomizer.js' %}"></script>
+</head>
+<body>
+<div id="header" class="panel">
+	<h1>SDV Crops Randomizer</h1>
+	<h2>About</h2>
+</div>
+	<div id="input-continer" class="panel">
+	<h2>Configure Randomizer Settings</h2>
+	<p> Please select the options you would like for your randomization</p>
+	<form action="./cropShuffler.php" method="post">
+		<fieldset class="panel" name="RandomizedLocations">
+			<h3>Randomized Items</h3>
+			<input type="checkbox" id="harvestShuffle" name="harvestShuffle" value="--shuffle-harvest">
+			<label for="harvestShuffle">Shuffle Crop Harvest</label><br>
+			<input type="checkbox" id="forageShuffle" name="forageShuffle" value="--shuffle-forage">
+			<label for="forageShuffle">Shuffle Forage</label><br>
+			<input type="checkbox" id="fishShuffle" name="fishShuffle" value="--shuffle-fish">
+			<label for="fishShuffle">Shuffle Fish</label><br>
+			<div class="slidecontainer">
+				<h4>Number of Villagers: <span id="villagerValue"></span></h4>
+				<input type="range" min="0" max="29" value="0" step ="1" class="slider" id="numVill">
+			</div>
+			
+			<h4>Crop grow season settings</h4>
+			<select name="CropSeasons">
+				<option value="">Vanilla Crop Seasons</option>
+				<option value="--shuffle-seasons">Shuffle Crop Seasons</option>
+				<option value="--all-seasons">All Seasons</option>
+			</select>
+		</fieldset>
+		<fieldset class="panel"  name="miscSettings">
+			<h3>Misc Settings</h3>
+			<p>Shorten Crop Growth<input type="checkbox" name="basicSettings" value="--short-growth"></p>
+			<p>Early Seed Maker<input type="checkbox" name="basicSettings" value="--early-seed-maker"></p>
+		</fieldset>
+		<br>
+		<input type="submit" value="Generate Seed">
+	</form>
+</div>
+
+</body>
 </html>
