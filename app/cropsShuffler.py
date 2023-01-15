@@ -40,7 +40,7 @@ def writeDataFile(filepath, settingsDictionary):
 def parseArgs(argv):
 
     try:
-        opts, extra = getopt.getopt(argv[1:], "", ["shuffle-seasons", "all-seasons", "short-growth", "shuffle-harvest", "earlySeedMaker", "shuffle-fish", "shuffle-forage", "numVillagers=", "random-seed=", "Unpacked-folder="])
+        opts, extra = getopt.getopt(argv[1:], "", ["shuffle-seasons", "all-seasons", "short-growth", "shuffle-harvest", "early-seed-maker", "shuffle-fish", "shuffle-forage", "numVillagers=", "random-seed=", "Unpacked-folder="])
     except getopt.GetoptError as err:
         print(err)
         sys.exit(2)
